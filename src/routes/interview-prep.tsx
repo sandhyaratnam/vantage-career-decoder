@@ -87,7 +87,7 @@ function PrepPage() {
                     <p className="text-lg font-display font-semibold leading-snug text-foreground">{q.q}</p>
                   </div>
                 </div>
-                <div className="ml-13 pl-13 border-l-2 border-brand-accent/30 pl-5 ml-12">
+                <div className="ml-13 border-l-2 border-brand-accent/30 pl-5">
                   <div className="flex items-center gap-2 mb-1.5">
                     <Lightbulb className="size-3.5 text-brand-accent" />
                     <span className="text-[11px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">Strike point</span>
