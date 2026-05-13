@@ -9,8 +9,38 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MatchesRouteImport } from './routes/matches'
+import { Route as JdAnalysisRouteImport } from './routes/jd-analysis'
+import { Route as InterviewPrepRouteImport } from './routes/interview-prep'
+import { Route as CompareRouteImport } from './routes/compare'
+import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as IndexRouteImport } from './routes/index'
 
+const MatchesRoute = MatchesRouteImport.update({
+  id: '/matches',
+  path: '/matches',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JdAnalysisRoute = JdAnalysisRouteImport.update({
+  id: '/jd-analysis',
+  path: '/jd-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InterviewPrepRoute = InterviewPrepRouteImport.update({
+  id: '/interview-prep',
+  path: '/interview-prep',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompareRoute = CompareRouteImport.update({
+  id: '/compare',
+  path: '/compare',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApplicationsRoute = ApplicationsRouteImport.update({
+  id: '/applications',
+  path: '/applications',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +49,102 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/applications': typeof ApplicationsRoute
+  '/compare': typeof CompareRoute
+  '/interview-prep': typeof InterviewPrepRoute
+  '/jd-analysis': typeof JdAnalysisRoute
+  '/matches': typeof MatchesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/applications': typeof ApplicationsRoute
+  '/compare': typeof CompareRoute
+  '/interview-prep': typeof InterviewPrepRoute
+  '/jd-analysis': typeof JdAnalysisRoute
+  '/matches': typeof MatchesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/applications': typeof ApplicationsRoute
+  '/compare': typeof CompareRoute
+  '/interview-prep': typeof InterviewPrepRoute
+  '/jd-analysis': typeof JdAnalysisRoute
+  '/matches': typeof MatchesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/applications'
+    | '/compare'
+    | '/interview-prep'
+    | '/jd-analysis'
+    | '/matches'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/applications'
+    | '/compare'
+    | '/interview-prep'
+    | '/jd-analysis'
+    | '/matches'
+  id:
+    | '__root__'
+    | '/'
+    | '/applications'
+    | '/compare'
+    | '/interview-prep'
+    | '/jd-analysis'
+    | '/matches'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApplicationsRoute: typeof ApplicationsRoute
+  CompareRoute: typeof CompareRoute
+  InterviewPrepRoute: typeof InterviewPrepRoute
+  JdAnalysisRoute: typeof JdAnalysisRoute
+  MatchesRoute: typeof MatchesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/matches': {
+      id: '/matches'
+      path: '/matches'
+      fullPath: '/matches'
+      preLoaderRoute: typeof MatchesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/jd-analysis': {
+      id: '/jd-analysis'
+      path: '/jd-analysis'
+      fullPath: '/jd-analysis'
+      preLoaderRoute: typeof JdAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/interview-prep': {
+      id: '/interview-prep'
+      path: '/interview-prep'
+      fullPath: '/interview-prep'
+      preLoaderRoute: typeof InterviewPrepRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compare': {
+      id: '/compare'
+      path: '/compare'
+      fullPath: '/compare'
+      preLoaderRoute: typeof CompareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/applications': {
+      id: '/applications'
+      path: '/applications'
+      fullPath: '/applications'
+      preLoaderRoute: typeof ApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +157,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApplicationsRoute: ApplicationsRoute,
+  CompareRoute: CompareRoute,
+  InterviewPrepRoute: InterviewPrepRoute,
+  JdAnalysisRoute: JdAnalysisRoute,
+  MatchesRoute: MatchesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
