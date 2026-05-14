@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign, Clock, AlertTriangle, ChevronRight, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { scoreCareers } from "@/lib/career-data";
+import { generateAIMatches, type AIMatch } from "@/lib/ai-matches";
 import { useAppState } from "@/lib/store";
 
 export const Route = createFileRoute("/matches")({
@@ -20,8 +21,34 @@ function MatchesPage() {
   const { state, update } = useAppState();
   const ranked = useMemo(() => scoreCareers(state.answers), [state.answers]);
   const hasAnswers = Object.keys(state.answers).length > 0;
-  const top = ranked[0];
-  const rest = ranked.slice(1);
+
+  const [aiMatches, setAiMatches] = useState<AIMatch[] | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [answersKey, setAnswersKey] = useState("");
+
+  const currentKey = JSON.stringify(state.answers);
+
+  useEffect(() => {
+    if (!hasAnswers) return;
+    if (currentKey === answersKey && aiMatches) return;
+    setAnswersKey(currentKey);
+    loadAIMatches();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasAnswers, currentKey]);
+
+  const loadAIMatches = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const matches = await generateAIMatches({ data: { answers: state.answers } });
+      setAiMatches(matches);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "AI generation failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const toggleCompare = (id: string) => {
     update((s) => {
@@ -42,6 +69,44 @@ function MatchesPage() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[calc(100vh-3.5rem)] px-6">
+        <div className="max-w-md text-center">
+          <div className="size-14 rounded-2xl bg-brand-soft text-brand-accent grid place-items-center mx-auto mb-6 animate-pulse">
+            <Sparkles className="size-6" />
+          </div>
+          <h2 className="font-display text-2xl font-bold mb-3">Generating your matches</h2>
+          <p className="text-muted-foreground leading-relaxed">AI is analyzing your survey responses and crafting personalized recommendations…</p>
+        </div>
+      </div>
+    );
+  }
+
+  const matches: DisplayMatch[] = aiMatches
+    ? aiMatches.map((m) => ({ type: "ai" as const, ...m, id: m.title.toLowerCase().replace(/\s+/g, "-") }))
+    : ranked.map((r) => ({
+        type: "static" as const,
+        id: r.career.id,
+        title: r.career.title,
+        family: r.career.family,
+        industry: r.career.industry,
+        blurb: r.career.blurb,
+        fit: r.fit,
+        salaryLow: r.career.salaryLow,
+        salaryHigh: r.career.salaryHigh,
+        tcNote: r.career.tcNote,
+        transitionTime: r.career.transitionTime,
+        growth: r.career.growth,
+        remote: r.career.remote,
+        nextSteps: r.career.nextSteps,
+        watchOut: r.career.watchOut,
+        tags: r.career.tags,
+      }));
+
+  const top = matches[0];
+  const rest = matches.slice(1);
+
   return (
     <div className="px-6 md:px-12 py-10 max-w-7xl mx-auto">
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
@@ -49,10 +114,20 @@ function MatchesPage() {
           <div className="text-[11px] uppercase tracking-[0.22em] text-brand-accent font-semibold mb-3">Phase 02 · Ranked outcomes</div>
           <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-3">Your career matches.</h1>
           <p className="text-muted-foreground text-lg leading-relaxed">
-            Scored from your {Object.keys(state.answers).length} answers. Pick a few to compare side-by-side, or jump straight into a job description.
+            {aiMatches ? "AI-generated" : "Scored"} from your {Object.keys(state.answers).length} answers. Pick a few to compare side-by-side, or jump straight into a job description.
           </p>
+          {error && (
+            <p className="text-sm text-amber-500 mt-2">
+              AI generation unavailable — showing scored matches. <button onClick={loadAIMatches} className="underline hover:text-amber-400">Retry</button>
+            </p>
+          )}
         </div>
         <div className="flex items-center gap-3 shrink-0">
+          {aiMatches && (
+            <Button variant="outline" className="rounded-full h-11" onClick={loadAIMatches} title="Regenerate AI matches">
+              <RotateCcw className="size-4 mr-1.5" /> Regenerate
+            </Button>
+          )}
           {state.compareIds.length > 0 && (
             <Link to="/compare">
               <Button className="rounded-full h-11 bg-brand text-brand-foreground hover:bg-brand-accent">
@@ -72,21 +147,21 @@ function MatchesPage() {
         <div className="relative grid md:grid-cols-12 gap-10 items-end">
           <div className="md:col-span-7">
             <div className="text-[11px] uppercase tracking-[0.22em] opacity-70 font-semibold mb-3">Best alignment</div>
-            <h2 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4">{top.career.title}</h2>
-            <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-4">{top.career.blurb}</p>
+            <h2 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4">{top.title}</h2>
+            <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-4">{top.blurb}</p>
             <div className="flex flex-wrap gap-2 mb-4">
-              {top.career.industry.map((ind) => (
+              {top.industry.map((ind) => (
                 <span key={ind} className="text-[11px] px-3 py-1 rounded-full bg-brand-foreground/20 border border-brand-foreground/30 font-semibold">{ind}</span>
               ))}
             </div>
             <div className="flex flex-wrap gap-2 mb-8">
-              {top.career.tags.map((t) => (
+              {top.tags.map((t) => (
                 <span key={t} className="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full bg-brand-foreground/10 border border-brand-foreground/20">{t}</span>
               ))}
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button onClick={() => toggleCompare(top.career.id)} variant="secondary" className="rounded-full h-11 bg-brand-foreground text-brand hover:bg-brand-foreground/90">
-                {state.compareIds.includes(top.career.id) ? <><Check className="size-4 mr-1.5" /> In compare</> : <><Plus className="size-4 mr-1.5" /> Add to compare</>}
+              <Button onClick={() => toggleCompare(top.id)} variant="secondary" className="rounded-full h-11 bg-brand-foreground text-brand hover:bg-brand-foreground/90">
+                {state.compareIds.includes(top.id) ? <><Check className="size-4 mr-1.5" /> In compare</> : <><Plus className="size-4 mr-1.5" /> Add to compare</>}
               </Button>
               <Link to="/jd-analysis">
                 <Button variant="outline" className="rounded-full h-11 border-brand-foreground/30 bg-transparent text-brand-foreground hover:bg-brand-foreground/10">
@@ -101,10 +176,10 @@ function MatchesPage() {
               <div className="text-xs uppercase tracking-[0.18em] opacity-70">Fit</div>
             </div>
             <dl className="space-y-4 text-sm">
-              <Stat icon={DollarSign} label={top.career.tcNote ?? "Salary range"} value={`$${top.career.salaryLow}k – $${top.career.salaryHigh}k`} />
-              <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
-              <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
-              <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
+              <Stat icon={DollarSign} label={top.tcNote ?? "Salary range"} value={`$${top.salaryLow}k – $${top.salaryHigh}k`} />
+              <Stat icon={Clock} label="Transition" value={top.transitionTime} />
+              <Stat icon={TrendingUp} label="Market" value={top.growth} />
+              <Stat icon={MapPin} label="Work mode" value={top.remote} />
             </dl>
           </div>
         </div>
@@ -114,7 +189,7 @@ function MatchesPage() {
           <div>
             <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 font-semibold mb-3">Next-step ladder</div>
             <ul className="space-y-2">
-              {top.career.nextSteps.map((s) => (
+              {top.nextSteps.map((s) => (
                 <li key={s} className="flex items-center gap-2 text-sm">
                   <ChevronRight className="size-4 opacity-60" />
                   <span>{s}</span>
@@ -126,7 +201,7 @@ function MatchesPage() {
             <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold mb-2">
               <AlertTriangle className="size-3.5" /> Watch out
             </div>
-            <p className="text-sm leading-relaxed opacity-90">{top.career.watchOut}</p>
+            <p className="text-sm leading-relaxed opacity-90">{top.watchOut}</p>
           </div>
         </div>
       </article>
@@ -134,40 +209,40 @@ function MatchesPage() {
       {/* Rest of matches */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {rest.map((r) => {
-          const inCompare = state.compareIds.includes(r.career.id);
+          const inCompare = state.compareIds.includes(r.id);
           return (
-            <article key={r.career.id} className="group rounded-2xl bg-card border border-border p-6 hover:border-brand-accent/40 hover:shadow-card transition-all flex flex-col">
+            <article key={r.id} className="group rounded-2xl bg-card border border-border p-6 hover:border-brand-accent/40 hover:shadow-card transition-all flex flex-col">
               <div className="flex items-start justify-between mb-4">
-                <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">{r.career.family}</div>
+                <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground font-semibold">{r.family}</div>
                 <div className="font-mono text-sm font-semibold text-brand-accent tabular-nums">{r.fit}%</div>
               </div>
-              <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.career.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{r.career.blurb}</p>
+              <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{r.blurb}</p>
               <div className="flex flex-wrap gap-1.5 mb-3">
-                {r.career.industry.map((ind) => (
+                {r.industry.map((ind) => (
                   <span key={ind} className="text-[10px] px-2 py-0.5 rounded-md bg-brand-soft text-brand-accent font-semibold tracking-wide">{ind}</span>
                 ))}
               </div>
               <div className="flex flex-wrap gap-1.5 mb-4">
-                {r.career.tags.slice(0, 3).map((t) => (
+                {r.tags.slice(0, 3).map((t) => (
                   <Badge key={t} variant="secondary" className="text-[10px] uppercase tracking-wider font-medium">{t}</Badge>
                 ))}
               </div>
               <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] mb-4 pt-4 border-t border-border">
                 <div>
                   <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC</dt>
-                  <dd className="font-mono text-foreground/90 mt-0.5">${r.career.salaryLow}k–${r.career.salaryHigh}k</dd>
+                  <dd className="font-mono text-foreground/90 mt-0.5">${r.salaryLow}k–${r.salaryHigh}k</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">Transition</dt>
-                  <dd className="text-foreground/90 mt-0.5">{r.career.transitionTime}</dd>
+                  <dd className="text-foreground/90 mt-0.5">{r.transitionTime}</dd>
                 </div>
               </dl>
-              {r.career.nextSteps.length > 0 && (
+              {r.nextSteps.length > 0 && (
                 <div className="mb-4">
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1.5">Next steps</div>
                   <ul className="space-y-1">
-                    {r.career.nextSteps.slice(0, 2).map((s) => (
+                    {r.nextSteps.slice(0, 2).map((s) => (
                       <li key={s} className="text-xs text-foreground/80 flex items-start gap-1.5">
                         <ChevronRight className="size-3 mt-0.5 text-brand-accent shrink-0" /><span>{s}</span>
                       </li>
@@ -179,13 +254,13 @@ function MatchesPage() {
                 <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-amber-400 font-semibold mb-1">
                   <AlertTriangle className="size-3" /> Watch out
                 </div>
-                <p className="text-[11px] text-foreground/75 leading-relaxed line-clamp-3">{r.career.watchOut}</p>
+                <p className="text-[11px] text-foreground/75 leading-relaxed line-clamp-3">{r.watchOut}</p>
               </div>
               <div className="flex items-center justify-end pt-3 border-t border-border">
                 <Button
                   size="sm"
                   variant={inCompare ? "default" : "ghost"}
-                  onClick={() => toggleCompare(r.career.id)}
+                  onClick={() => toggleCompare(r.id)}
                   className={`rounded-full h-8 text-xs ${inCompare ? "bg-brand text-brand-foreground hover:bg-brand-accent" : ""}`}
                 >
                   {inCompare ? <><Check className="size-3 mr-1" /> Added</> : <><Plus className="size-3 mr-1" /> Compare</>}
@@ -198,6 +273,25 @@ function MatchesPage() {
     </div>
   );
 }
+
+type DisplayMatch = {
+  type: "ai" | "static";
+  id: string;
+  title: string;
+  family: string;
+  industry: string[];
+  blurb: string;
+  fit: number;
+  salaryLow: number;
+  salaryHigh: number;
+  tcNote?: string;
+  transitionTime: string;
+  growth: "Cooling" | "Steady" | "Hot";
+  remote: "Mostly remote" | "Hybrid" | "On-site heavy";
+  nextSteps: string[];
+  watchOut: string;
+  tags: string[];
+};
 
 function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
   return (
