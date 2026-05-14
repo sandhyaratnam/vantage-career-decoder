@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign } from "lucide-react";
+import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign, Clock, AlertTriangle, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { scoreCareers } from "@/lib/career-data";
