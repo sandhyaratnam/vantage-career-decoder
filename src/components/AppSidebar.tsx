@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { ClipboardList, Sparkles, GitCompareArrows, FileSearch, Briefcase, MessagesSquare, Compass } from "lucide-react";
+import { ClipboardList, Sparkles, GitCompareArrows, FileSearch, Briefcase, MessagesSquare, Compass, UserCircle2 } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -18,11 +18,12 @@ import { surveyQuestions } from "@/lib/career-data";
 
 const flow = [
   { step: "01", title: "Survey", url: "/", icon: ClipboardList },
-  { step: "02", title: "Matches", url: "/matches", icon: Sparkles },
-  { step: "03", title: "Compare", url: "/compare", icon: GitCompareArrows },
-  { step: "04", title: "JD Analysis", url: "/jd-analysis", icon: FileSearch },
-  { step: "05", title: "Applications", url: "/applications", icon: Briefcase },
-  { step: "06", title: "Interview Prep", url: "/interview-prep", icon: MessagesSquare },
+  { step: "02", title: "Profile", url: "/profile", icon: UserCircle2 },
+  { step: "03", title: "Matches", url: "/matches", icon: Sparkles },
+  { step: "04", title: "Compare", url: "/compare", icon: GitCompareArrows },
+  { step: "05", title: "JD Analysis", url: "/jd-analysis", icon: FileSearch },
+  { step: "06", title: "Applications", url: "/applications", icon: Briefcase },
+  { step: "07", title: "Interview Prep", url: "/interview-prep", icon: MessagesSquare },
 ];
 
 export function AppSidebar() {

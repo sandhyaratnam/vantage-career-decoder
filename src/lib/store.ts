@@ -13,11 +13,36 @@ export type Application = {
   createdAt: number;
 };
 
+export type Profile = {
+  name: string;
+  currentRole: string;
+  yearsExperience: string;
+  education: string;
+  location: string;
+  targetGeos: string;
+  about: string;
+  resumeName: string;
+  resumeText: string;
+};
+
 export type AppState = {
   answers: Record<string, string[] | string>;
   compareIds: string[];
   applications: Application[];
   lastJD: string;
+  profile: Profile;
+};
+
+const emptyProfile: Profile = {
+  name: "",
+  currentRole: "",
+  yearsExperience: "",
+  education: "",
+  location: "",
+  targetGeos: "",
+  about: "",
+  resumeName: "",
+  resumeText: "",
 };
 
 const initial: AppState = {
@@ -25,6 +50,7 @@ const initial: AppState = {
   compareIds: [],
   applications: [],
   lastJD: "",
+  profile: emptyProfile,
 };
 
 function read(): AppState {
@@ -32,7 +58,8 @@ function read(): AppState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return initial;
-    return { ...initial, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return { ...initial, ...parsed, profile: { ...emptyProfile, ...(parsed.profile || {}) } };
   } catch {
     return initial;
   }
