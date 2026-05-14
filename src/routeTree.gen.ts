@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as MatchesRouteImport } from './routes/matches'
 import { Route as JdAnalysisRouteImport } from './routes/jd-analysis'
 import { Route as InterviewPrepRouteImport } from './routes/interview-prep'
@@ -16,6 +17,11 @@ import { Route as CompareRouteImport } from './routes/compare'
 import { Route as ApplicationsRouteImport } from './routes/applications'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MatchesRoute = MatchesRouteImport.update({
   id: '/matches',
   path: '/matches',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/interview-prep': typeof InterviewPrepRoute
   '/jd-analysis': typeof JdAnalysisRoute
   '/matches': typeof MatchesRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/interview-prep': typeof InterviewPrepRoute
   '/jd-analysis': typeof JdAnalysisRoute
   '/matches': typeof MatchesRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/interview-prep': typeof InterviewPrepRoute
   '/jd-analysis': typeof JdAnalysisRoute
   '/matches': typeof MatchesRoute
+  '/profile': typeof ProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/interview-prep'
     | '/jd-analysis'
     | '/matches'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/interview-prep'
     | '/jd-analysis'
     | '/matches'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/interview-prep'
     | '/jd-analysis'
     | '/matches'
+    | '/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,10 +118,18 @@ export interface RootRouteChildren {
   InterviewPrepRoute: typeof InterviewPrepRoute
   JdAnalysisRoute: typeof JdAnalysisRoute
   MatchesRoute: typeof MatchesRoute
+  ProfileRoute: typeof ProfileRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/matches': {
       id: '/matches'
       path: '/matches'
@@ -162,7 +182,18 @@ const rootRouteChildren: RootRouteChildren = {
   InterviewPrepRoute: InterviewPrepRoute,
   JdAnalysisRoute: JdAnalysisRoute,
   MatchesRoute: MatchesRoute,
+  ProfileRoute: ProfileRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
