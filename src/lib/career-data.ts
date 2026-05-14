@@ -130,6 +130,10 @@ export type Career = {
   tags: string[];
   salaryLow: number;
   salaryHigh: number;
+  tcNote?: string;
+  transitionTime: string;
+  nextSteps: string[];
+  watchOut: string;
   growth: "Cooling" | "Steady" | "Hot";
   remote: "Mostly remote" | "Hybrid" | "On-site heavy";
   dayInLife: string;
