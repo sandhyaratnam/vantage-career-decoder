@@ -96,10 +96,32 @@ function MatchesPage() {
               <div className="text-xs uppercase tracking-[0.18em] opacity-70">Fit</div>
             </div>
             <dl className="space-y-4 text-sm">
-              <Stat icon={DollarSign} label="Salary range" value={`$${top.career.salaryLow}k – $${top.career.salaryHigh}k`} />
+              <Stat icon={DollarSign} label={top.career.tcNote ?? "Salary range"} value={`$${top.career.salaryLow}k – $${top.career.salaryHigh}k`} />
+              <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
               <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
               <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
             </dl>
+          </div>
+        </div>
+
+        {/* Next steps + watch out */}
+        <div className="relative grid md:grid-cols-2 gap-4 mt-10 pt-8 border-t border-brand-foreground/15">
+          <div>
+            <div className="text-[10px] uppercase tracking-[0.18em] opacity-70 font-semibold mb-3">Next-step ladder</div>
+            <ul className="space-y-2">
+              {top.career.nextSteps.map((s) => (
+                <li key={s} className="flex items-center gap-2 text-sm">
+                  <ChevronRight className="size-4 opacity-60" />
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="rounded-xl bg-brand-foreground/10 border border-brand-foreground/15 p-4">
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.18em] opacity-80 font-semibold mb-2">
+              <AlertTriangle className="size-3.5" /> Watch out
+            </div>
+            <p className="text-sm leading-relaxed opacity-90">{top.career.watchOut}</p>
           </div>
         </div>
       </article>
