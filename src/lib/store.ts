@@ -58,7 +58,8 @@ function read(): AppState {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return initial;
-    return { ...initial, ...JSON.parse(raw) };
+    const parsed = JSON.parse(raw);
+    return { ...initial, ...parsed, profile: { ...emptyProfile, ...(parsed.profile || {}) } };
   } catch {
     return initial;
   }
