@@ -138,13 +138,40 @@ function MatchesPage() {
               </div>
               <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.career.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">{r.career.blurb}</p>
-              <div className="flex flex-wrap gap-1.5 mb-5">
+              <div className="flex flex-wrap gap-1.5 mb-4">
                 {r.career.tags.slice(0, 3).map((t) => (
                   <Badge key={t} variant="secondary" className="text-[10px] uppercase tracking-wider font-medium">{t}</Badge>
                 ))}
               </div>
-              <div className="flex items-center gap-2 pt-4 border-t border-border">
-                <div className="text-xs text-muted-foreground flex-1">${r.career.salaryLow}k – ${r.career.salaryHigh}k</div>
+              <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] mb-4 pt-4 border-t border-border">
+                <div>
+                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC</dt>
+                  <dd className="font-mono text-foreground/90 mt-0.5">${r.career.salaryLow}k–${r.career.salaryHigh}k</dd>
+                </div>
+                <div>
+                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">Transition</dt>
+                  <dd className="text-foreground/90 mt-0.5">{r.career.transitionTime}</dd>
+                </div>
+              </dl>
+              {r.career.nextSteps.length > 0 && (
+                <div className="mb-4">
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70 font-semibold mb-1.5">Next steps</div>
+                  <ul className="space-y-1">
+                    {r.career.nextSteps.slice(0, 2).map((s) => (
+                      <li key={s} className="text-xs text-foreground/80 flex items-start gap-1.5">
+                        <ChevronRight className="size-3 mt-0.5 text-brand-accent shrink-0" /><span>{s}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <div className="rounded-lg bg-amber-500/10 border border-amber-500/20 p-3 mb-4">
+                <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-amber-400 font-semibold mb-1">
+                  <AlertTriangle className="size-3" /> Watch out
+                </div>
+                <p className="text-[11px] text-foreground/75 leading-relaxed line-clamp-3">{r.career.watchOut}</p>
+              </div>
+              <div className="flex items-center justify-end pt-3 border-t border-border">
                 <Button
                   size="sm"
                   variant={inCompare ? "default" : "ghost"}
