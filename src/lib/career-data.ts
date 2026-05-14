@@ -127,6 +127,7 @@ export type Career = {
   title: string;
   blurb: string;
   family: string;
+  industry: string[];
   tags: string[];
   salaryLow: number;
   salaryHigh: number;
@@ -148,6 +149,7 @@ export const careers: Career[] = [
     id: "tech-pm",
     title: "Technical Product Manager (FinTech / Big Tech)",
     family: "Product",
+    industry: ["FinTech", "Big Tech", "SaaS"],
     blurb: "The natural pivot for a strong engineer with strategic chops. TPM roles at places like Stripe, Plaid, Google, or Amazon reward people who can write a spec and read a stack trace in the same hour.",
     tags: ["strategy", "people", "builder", "analytical"],
     salaryLow: 160, salaryHigh: 240, tcNote: "TC incl. equity",
@@ -169,6 +171,7 @@ export const careers: Career[] = [
     id: "strategy-ops",
     title: "Strategy & Operations Manager (Tech / FinTech)",
     family: "Strategy",
+    industry: ["Tech", "FinTech", "E-commerce", "Marketplace"],
     blurb: "Tailor-made for MBA + technical backgrounds. Strat & Ops at Uber, Airbnb, Block, or Robinhood gets you ambiguous, high-leverage problems and exposure to executive decision-making early.",
     tags: ["strategy", "operator", "people", "analytical"],
     salaryLow: 140, salaryHigh: 200, tcNote: "TC",
@@ -189,6 +192,7 @@ export const careers: Career[] = [
     id: "vc-associate",
     title: "Venture Capital Associate / Investor (FinTech focus)",
     family: "Finance",
+    industry: ["Venture Capital", "Private Equity", "FinTech"],
     blurb: "Engineer + top-MBA + bank-domain expertise is exactly the operator profile fintech and infrastructure VCs recruit for. Rewards strategic pattern-matching and crisp written synthesis.",
     tags: ["analytical", "strategy", "people"],
     salaryLow: 120, salaryHigh: 180, tcNote: "Base + carry; carry illiquid for years",
@@ -209,6 +213,7 @@ export const careers: Career[] = [
     id: "corp-strategy",
     title: "Product / Corporate Strategy at a Bank or FinTech",
     family: "Strategy",
+    industry: ["Financial Services", "FinTech", "Banking"],
     blurb: "Stay adjacent to financial services but move into an internal strategy function (Chase strategy, Visa product strategy, PayPal corp dev). Leverages domain knowledge and accelerates the path to VP / Director.",
     tags: ["strategy", "analytical", "people"],
     salaryLow: 130, salaryHigh: 190, tcNote: "Base + bonus",
@@ -228,6 +233,7 @@ export const careers: Career[] = [
     id: "founder-fintech",
     title: "Founder / Co-Founder (FinTech or B2B SaaS)",
     family: "Entrepreneurship",
+    industry: ["FinTech", "B2B SaaS", "Early-Stage Startup"],
     blurb: "Engineering chops + MBA from a strong entrepreneurship program + moderate risk tolerance is a credible founder profile — especially for a problem you discovered inside a major bank.",
     tags: ["strategy", "operator", "builder", "people"],
     salaryLow: 0, salaryHigh: 250, tcNote: "Highly variable; below-market early",
@@ -248,6 +254,7 @@ export const careers: Career[] = [
     id: "systems-architect",
     title: "Staff / Principal Engineer (Systems Architect)",
     family: "Engineering",
+    industry: ["Tech", "Cloud Computing", "FinTech", "Infrastructure"],
     blurb: "Designs the load-bearing structure of large software systems — the bones the rest of the org builds on.",
     tags: ["analytical", "builder", "strategy"],
     salaryLow: 180, salaryHigh: 320, tcNote: "TC incl. equity",
@@ -268,6 +275,7 @@ export const careers: Career[] = [
     id: "data-scientist",
     title: "Senior Data Scientist (Product / Growth)",
     family: "Data",
+    industry: ["Tech", "Healthcare", "Finance", "E-commerce"],
     blurb: "Turns messy reality into models and decisions — equal parts statistician, storyteller, and skeptic.",
     tags: ["analytical", "builder"],
     salaryLow: 160, salaryHigh: 240, tcNote: "TC",
@@ -288,6 +296,7 @@ export const careers: Career[] = [
     id: "ux-designer",
     title: "UX / Product Designer",
     family: "Design",
+    industry: ["Tech", "Consumer Products", "Media", "Agency"],
     blurb: "Shapes how a product feels and flows. The best ones make the right path the obvious path.",
     tags: ["creative", "people", "builder"],
     salaryLow: 110, salaryHigh: 190, tcNote: "TC",
@@ -307,6 +316,7 @@ export const careers: Career[] = [
     id: "ops-leader",
     title: "Operations Leader / Chief of Staff",
     family: "Operations",
+    industry: ["Tech", "Operations", "Logistics", "Healthcare"],
     blurb: "The reason things actually ship. Process, people, and the unglamorous mechanics of turning plans into outcomes.",
     tags: ["operator", "people", "strategy"],
     salaryLow: 140, salaryHigh: 230, tcNote: "Base + bonus",
@@ -326,6 +336,7 @@ export const careers: Career[] = [
     id: "research-scientist",
     title: "Research Scientist (ML / Applied)",
     family: "Research",
+    industry: ["AI / ML", "Academia", "Big Tech", "Biotech"],
     blurb: "Pushes the frontier. Long timelines, deep specialization, and the patience to be wrong publicly.",
     tags: ["analytical", "builder"],
     salaryLow: 200, salaryHigh: 400, tcNote: "TC; frontier labs much higher",
@@ -345,6 +356,7 @@ export const careers: Career[] = [
     id: "creative-director",
     title: "Creative Director",
     family: "Creative",
+    industry: ["Media", "Advertising", "Brand", "Agency"],
     blurb: "Sets the taste. Holds the line on craft when everyone else is optimizing for the meeting.",
     tags: ["creative", "people", "strategy"],
     salaryLow: 140, salaryHigh: 260, tcNote: "Base + bonus",
@@ -366,7 +378,164 @@ export const allTags = ["analytical", "builder", "strategy", "people", "operator
 
 export type SurveyAnswers = Record<string, string[] | string>;
 
+// Career-specific affinity rules: boosts raise fit, drains lower it.
+type AffinityRule = {
+  boosts: Partial<Record<string, string[]>>;
+  drains: Partial<Record<string, string[]>>;
+};
+
+const affinityRules: Record<string, AffinityRule> = {
+  "tech-pm": {
+    boosts: {
+      values: ["income", "impact", "leadership"],
+      energizes: ["strategy", "communicating", "leading"],
+      skills: ["product", "technical", "writing"],
+      risk: ["moderate", "uncertainty"],
+    },
+    drains: {
+      drains: ["politics", "managing"],
+      energizes: ["hands-on", "research"],
+      skills: ["design", "teaching"],
+    },
+  },
+  "strategy-ops": {
+    boosts: {
+      values: ["impact", "challenge", "leadership"],
+      energizes: ["strategy", "executing", "leading"],
+      skills: ["ops", "finance", "product"],
+      risk: ["moderate"],
+    },
+    drains: {
+      drains: ["bureaucracy", "unclear"],
+      values: ["creative", "balance"],
+      skills: ["design", "teaching"],
+    },
+  },
+  "vc-associate": {
+    boosts: {
+      values: ["prestige", "challenge", "income"],
+      energizes: ["strategy", "research", "relationships"],
+      skills: ["finance", "writing", "research"],
+      risk: ["moderate", "uncertainty"],
+    },
+    drains: {
+      drains: ["isolation", "repetitive"],
+      values: ["stability", "balance"],
+      horizon: ["now"],
+    },
+  },
+  "corp-strategy": {
+    boosts: {
+      values: ["stability", "prestige", "income"],
+      energizes: ["strategy", "communicating"],
+      skills: ["finance", "writing", "product"],
+      risk: ["stability", "moderate"],
+    },
+    drains: {
+      drains: ["bureaucracy", "politics"],
+      values: ["creative", "autonomy"],
+      risk: ["uncertainty"],
+    },
+  },
+  "founder-fintech": {
+    boosts: {
+      values: ["autonomy", "impact", "creative"],
+      energizes: ["innovating", "executing", "strategy"],
+      skills: ["technical", "product", "sales"],
+      risk: ["uncertainty", "career-risk"],
+      horizon: ["transition", "exploring"],
+    },
+    drains: {
+      values: ["stability", "balance", "prestige"],
+      drains: ["pressure", "unclear"],
+      risk: ["stability"],
+      horizon: ["now"],
+    },
+  },
+  "systems-architect": {
+    boosts: {
+      values: ["challenge", "autonomy"],
+      energizes: ["hands-on", "systems", "problems"],
+      skills: ["technical", "data"],
+      risk: ["stability", "career-risk"],
+    },
+    drains: {
+      drains: ["managing", "context-switching"],
+      energizes: ["leading", "communicating"],
+      skills: ["sales", "teaching"],
+    },
+  },
+  "data-scientist": {
+    boosts: {
+      values: ["challenge", "balance"],
+      energizes: ["research", "problems", "hands-on"],
+      skills: ["data", "technical", "research"],
+      risk: ["stability", "moderate"],
+    },
+    drains: {
+      drains: ["repetitive", "managing"],
+      energizes: ["leading", "communicating"],
+      skills: ["sales", "design"],
+    },
+  },
+  "ux-designer": {
+    boosts: {
+      values: ["creative", "autonomy", "impact"],
+      energizes: ["innovating", "hands-on", "communicating"],
+      skills: ["design", "writing"],
+      risk: ["career-risk", "moderate"],
+    },
+    drains: {
+      drains: ["no-creative", "repetitive"],
+      skills: ["finance", "sales", "ops"],
+      energizes: ["strategy", "executing"],
+    },
+  },
+  "ops-leader": {
+    boosts: {
+      values: ["impact", "leadership", "stability"],
+      energizes: ["executing", "leading", "systems"],
+      skills: ["ops", "writing"],
+      risk: ["stability", "moderate"],
+    },
+    drains: {
+      drains: ["unclear", "bureaucracy"],
+      values: ["creative"],
+      energizes: ["hands-on", "research"],
+    },
+  },
+  "research-scientist": {
+    boosts: {
+      values: ["challenge", "autonomy"],
+      energizes: ["research", "problems", "innovating"],
+      skills: ["technical", "data", "research"],
+      risk: ["career-risk"],
+      horizon: ["exploring", "transition"],
+    },
+    drains: {
+      drains: ["repetitive", "pressure"],
+      energizes: ["leading", "executing"],
+      skills: ["sales", "ops"],
+      horizon: ["now"],
+    },
+  },
+  "creative-director": {
+    boosts: {
+      values: ["creative", "prestige", "autonomy"],
+      energizes: ["communicating", "innovating", "leading"],
+      skills: ["design", "writing"],
+      risk: ["moderate", "career-risk"],
+    },
+    drains: {
+      drains: ["no-creative", "politics"],
+      skills: ["technical", "data", "finance"],
+      energizes: ["hands-on", "systems"],
+    },
+  },
+};
+
 export function scoreCareers(answers: SurveyAnswers) {
+  // Phase 1: tag-based baseline
   const tagCounts: Record<string, number> = {};
   for (const q of surveyQuestions) {
     if (q.type === "text" || !q.options) continue;
@@ -379,13 +548,50 @@ export function scoreCareers(answers: SurveyAnswers) {
       for (const t of opt.tags) tagCounts[t] = (tagCounts[t] || 0) + 1;
     }
   }
-  const totalAnswered = Object.values(tagCounts).reduce((a, b) => a + b, 0) || 1;
+  const totalTagHits = Object.values(tagCounts).reduce((a, b) => a + b, 0) || 1;
+
+  // Phase 2: flat sets of selected values per question
+  const selectedByQ: Record<string, Set<string>> = {};
+  for (const q of surveyQuestions) {
+    if (q.type === "text") continue;
+    const ans = answers[q.id];
+    selectedByQ[q.id] = new Set(ans ? (Array.isArray(ans) ? ans : [ans]) : []);
+  }
+
+  const hasAnyAnswers = Object.values(selectedByQ).some((s) => s.size > 0);
 
   return careers
     .map((c) => {
       const overlap = c.tags.reduce((sum, t) => sum + (tagCounts[t] || 0), 0);
-      const raw = overlap / Math.max(totalAnswered, c.tags.length);
-      const fit = Math.min(98, Math.round(55 + raw * 60));
+      const baseRaw = overlap / Math.max(totalTagHits, c.tags.length);
+
+      // Phase 3: affinity boost/drain deltas
+      const rule = affinityRules[c.id];
+      let affinityDelta = 0;
+
+      if (rule && hasAnyAnswers) {
+        let boostHits = 0, boostTotal = 0;
+        for (const [qid, vals] of Object.entries(rule.boosts)) {
+          if (!vals) continue;
+          const sel = selectedByQ[qid] ?? new Set();
+          for (const v of vals) { boostTotal++; if (sel.has(v)) boostHits++; }
+        }
+        let drainHits = 0, drainTotal = 0;
+        for (const [qid, vals] of Object.entries(rule.drains)) {
+          if (!vals) continue;
+          const sel = selectedByQ[qid] ?? new Set();
+          for (const v of vals) { drainTotal++; if (sel.has(v)) drainHits++; }
+        }
+        const boostRatio = boostTotal > 0 ? boostHits / boostTotal : 0;
+        const drainRatio = drainTotal > 0 ? drainHits / drainTotal : 0;
+        affinityDelta = boostRatio * 0.35 - drainRatio * 0.25;
+      }
+
+      const combined = Math.max(0, Math.min(1, baseRaw + affinityDelta));
+      const fit = hasAnyAnswers
+        ? Math.min(98, Math.max(42, Math.round(45 + combined * 53)))
+        : 50;
+
       return { career: c, fit };
     })
     .sort((a, b) => b.fit - a.fit);

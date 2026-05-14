@@ -18,12 +18,11 @@ import { surveyQuestions } from "@/lib/career-data";
 
 const flow = [
   { step: "01", title: "Survey", url: "/", icon: ClipboardList },
-  { step: "02", title: "Profile", url: "/profile", icon: UserCircle2 },
-  { step: "03", title: "Matches", url: "/matches", icon: Sparkles },
-  { step: "04", title: "Compare", url: "/compare", icon: GitCompareArrows },
-  { step: "05", title: "JD Analysis", url: "/jd-analysis", icon: FileSearch },
-  { step: "06", title: "Applications", url: "/applications", icon: Briefcase },
-  { step: "07", title: "Interview Prep", url: "/interview-prep", icon: MessagesSquare },
+  { step: "02", title: "Matches", url: "/matches", icon: Sparkles },
+  { step: "03", title: "Compare", url: "/compare", icon: GitCompareArrows },
+  { step: "04", title: "JD Analysis", url: "/jd-analysis", icon: FileSearch },
+  { step: "05", title: "Applications", url: "/applications", icon: Briefcase },
+  { step: "06", title: "Interview Prep", url: "/interview-prep", icon: MessagesSquare },
 ];
 
 export function AppSidebar() {
@@ -52,6 +51,22 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
+        {/* Profile — pinned above the flow */}
+        <SidebarGroup className="pb-1">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/profile"} tooltip="Profile" className="h-11 rounded-lg data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground">
+                  <Link to="/profile" className="flex items-center gap-3">
+                    <UserCircle2 className="size-4 shrink-0" />
+                    {!collapsed && <span className="text-sm">Profile</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/40">
             The Flow

@@ -23,6 +23,7 @@ export type Profile = {
   about: string;
   resumeName: string;
   resumeText: string;
+  linkedinUrl: string;
 };
 
 export type AppState = {
@@ -43,6 +44,7 @@ const emptyProfile: Profile = {
   about: "",
   resumeName: "",
   resumeText: "",
+  linkedinUrl: "",
 };
 
 const initial: AppState = {

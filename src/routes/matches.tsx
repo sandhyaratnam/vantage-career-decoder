@@ -73,7 +73,12 @@ function MatchesPage() {
           <div className="md:col-span-7">
             <div className="text-[11px] uppercase tracking-[0.22em] opacity-70 font-semibold mb-3">Best alignment</div>
             <h2 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4">{top.career.title}</h2>
-            <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-8">{top.career.blurb}</p>
+            <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-4">{top.career.blurb}</p>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {top.career.industry.map((ind) => (
+                <span key={ind} className="text-[11px] px-3 py-1 rounded-full bg-brand-foreground/20 border border-brand-foreground/30 font-semibold">{ind}</span>
+              ))}
+            </div>
             <div className="flex flex-wrap gap-2 mb-8">
               {top.career.tags.map((t) => (
                 <span key={t} className="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full bg-brand-foreground/10 border border-brand-foreground/20">{t}</span>
@@ -137,7 +142,12 @@ function MatchesPage() {
                 <div className="font-mono text-sm font-semibold text-brand-accent tabular-nums">{r.fit}%</div>
               </div>
               <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.career.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed mb-5 flex-1">{r.career.blurb}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{r.career.blurb}</p>
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                {r.career.industry.map((ind) => (
+                  <span key={ind} className="text-[10px] px-2 py-0.5 rounded-md bg-brand-soft text-brand-accent font-semibold tracking-wide">{ind}</span>
+                ))}
+              </div>
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {r.career.tags.slice(0, 3).map((t) => (
                   <Badge key={t} variant="secondary" className="text-[10px] uppercase tracking-wider font-medium">{t}</Badge>

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check } from "lucide-react";
+import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check, Linkedin, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -122,62 +122,129 @@ function ProfilePage() {
           </div>
         </section>
 
-        {/* Resume upload */}
-        <aside className="rounded-2xl bg-card border border-border p-6 md:p-8 h-fit">
-          <div className="flex items-center gap-2.5 mb-6">
-            <div className="size-9 rounded-lg bg-brand-soft text-brand-accent grid place-items-center">
-              <FileText className="size-5" />
+        {/* LinkedIn + Resume column */}
+        <aside className="flex flex-col gap-6">
+
+          {/* LinkedIn connect */}
+          <div className="rounded-2xl bg-card border border-border p-6 md:p-8">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="size-9 rounded-lg bg-[#0A66C2]/10 text-[#0A66C2] grid place-items-center">
+                <Linkedin className="size-5" />
+              </div>
+              <h2 className="font-display text-lg font-bold">LinkedIn</h2>
             </div>
-            <h2 className="font-display text-lg font-bold">Resume</h2>
+            {profile.linkedinUrl ? (
+              <div className="space-y-3">
+                <div className="rounded-xl border border-border bg-background p-3 flex items-center gap-3">
+                  <div className="size-8 rounded-lg bg-[#0A66C2]/10 text-[#0A66C2] grid place-items-center shrink-0">
+                    <Check className="size-4" />
+                  </div>
+                  <span className="text-sm text-foreground/80 truncate flex-1">{profile.linkedinUrl}</span>
+                  <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-brand-accent transition-colors">
+                    <ExternalLink className="size-4" />
+                  </a>
+                </div>
+                <Input
+                  value={profile.linkedinUrl}
+                  onChange={(e) => setField("linkedinUrl", e.target.value)}
+                  placeholder="https://linkedin.com/in/yourhandle"
+                  className="bg-background border-border h-10 text-sm"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { setField("linkedinUrl", ""); toast.success("LinkedIn disconnected"); }}
+                  className="text-muted-foreground hover:text-destructive text-xs w-full"
+                >
+                  Disconnect
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Input
+                  value={profile.linkedinUrl}
+                  onChange={(e) => setField("linkedinUrl", e.target.value)}
+                  placeholder="https://linkedin.com/in/yourhandle"
+                  className="bg-background border-border h-11"
+                />
+                <Button
+                  onClick={() => {
+                    const url = profile.linkedinUrl.trim();
+                    if (!url.includes("linkedin.com")) {
+                      toast.error("Enter a valid LinkedIn URL");
+                      return;
+                    }
+                    toast.success("LinkedIn connected", { description: "Your profile URL is saved." });
+                  }}
+                  className="w-full rounded-xl h-11 bg-[#0A66C2] hover:bg-[#004182] text-white"
+                >
+                  <Linkedin className="size-4 mr-2" /> Connect LinkedIn
+                </Button>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Paste your LinkedIn profile URL. It stays in your browser only.
+                </p>
+              </div>
+            )}
           </div>
 
-          {profile.resumeName ? (
-            <div className="space-y-4">
-              <div className="rounded-xl border border-border bg-background p-4 flex items-start gap-3">
-                <div className="size-9 rounded-lg bg-success/15 text-success grid place-items-center shrink-0">
-                  <Check className="size-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Saved</div>
-                  <div className="text-sm font-medium truncate">{profile.resumeName}</div>
-                </div>
-                <button onClick={clearResume} className="size-8 rounded-md hover:bg-accent grid place-items-center text-muted-foreground hover:text-destructive shrink-0">
-                  <Trash2 className="size-4" />
-                </button>
+          {/* Resume upload */}
+          <div className="rounded-2xl bg-card border border-border p-6 md:p-8 h-fit">
+            <div className="flex items-center gap-2.5 mb-6">
+              <div className="size-9 rounded-lg bg-brand-soft text-brand-accent grid place-items-center">
+                <FileText className="size-5" />
               </div>
-              <Textarea
-                value={profile.resumeText}
-                onChange={(e) => setField("resumeText", e.target.value)}
-                placeholder="Paste full resume text here for keyword matching…"
-                rows={8}
-                className="bg-background border-border resize-none font-mono text-xs"
-              />
+              <h2 className="font-display text-lg font-bold">Resume</h2>
             </div>
-          ) : (
-            <div>
-              <button
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="w-full rounded-xl border-2 border-dashed border-border hover:border-brand-accent/50 transition-colors p-8 text-center group"
-              >
-                <div className="size-12 rounded-full bg-brand-soft text-brand-accent grid place-items-center mx-auto mb-3 group-hover:scale-105 transition-transform">
-                  <Upload className="size-5" />
+
+            {profile.resumeName ? (
+              <div className="space-y-4">
+                <div className="rounded-xl border border-border bg-background p-4 flex items-start gap-3">
+                  <div className="size-9 rounded-lg bg-success/15 text-success grid place-items-center shrink-0">
+                    <Check className="size-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs uppercase tracking-wider text-muted-foreground mb-0.5">Saved</div>
+                    <div className="text-sm font-medium truncate">{profile.resumeName}</div>
+                  </div>
+                  <button onClick={clearResume} className="size-8 rounded-md hover:bg-accent grid place-items-center text-muted-foreground hover:text-destructive shrink-0">
+                    <Trash2 className="size-4" />
+                  </button>
                 </div>
-                <div className="font-medium text-sm mb-1">{uploading ? "Reading…" : "Upload resume"}</div>
-                <div className="text-xs text-muted-foreground">PDF, DOCX, TXT · max 2 MB</div>
-              </button>
-              <input
-                ref={fileRef}
-                type="file"
-                accept=".pdf,.doc,.docx,.txt,.md"
-                className="hidden"
-                onChange={(e) => onFile(e.target.files?.[0] ?? null)}
-              />
-              <p className="text-[11px] text-muted-foreground mt-4 leading-relaxed">
-                Tip: for best JD matching, paste your resume <em>text</em> after upload — PDF parsing happens client-side and stays imperfect.
-              </p>
-            </div>
-          )}
+                <Textarea
+                  value={profile.resumeText}
+                  onChange={(e) => setField("resumeText", e.target.value)}
+                  placeholder="Paste full resume text here for keyword matching…"
+                  rows={8}
+                  className="bg-background border-border resize-none font-mono text-xs"
+                />
+              </div>
+            ) : (
+              <div>
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full rounded-xl border-2 border-dashed border-border hover:border-brand-accent/50 transition-colors p-8 text-center group"
+                >
+                  <div className="size-12 rounded-full bg-brand-soft text-brand-accent grid place-items-center mx-auto mb-3 group-hover:scale-105 transition-transform">
+                    <Upload className="size-5" />
+                  </div>
+                  <div className="font-medium text-sm mb-1">{uploading ? "Reading…" : "Upload resume"}</div>
+                  <div className="text-xs text-muted-foreground">PDF, DOCX, TXT · max 2 MB</div>
+                </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept=".pdf,.doc,.docx,.txt,.md"
+                  className="hidden"
+                  onChange={(e) => onFile(e.target.files?.[0] ?? null)}
+                />
+                <p className="text-[11px] text-muted-foreground mt-4 leading-relaxed">
+                  Tip: for best JD matching, paste your resume <em>text</em> after upload — PDF parsing happens client-side and stays imperfect.
+                </p>
+              </div>
+            )}
+          </div>
+
         </aside>
       </div>
 
