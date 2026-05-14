@@ -38,7 +38,7 @@ function buildSurveyContext(answers: Record<string, string[] | string>): string 
 }
 
 export const generateAIMatches = createServerFn()
-  .validator((data: { answers: Record<string, string[] | string> }) => data)
+  .inputValidator((data: { answers: Record<string, string[] | string> }) => data)
   .handler(async ({ data }) => {
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
