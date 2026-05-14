@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { surveyQuestions } from "./career-data";
 
 export type AIMatch = {
@@ -40,49 +40,50 @@ function buildSurveyContext(answers: Record<string, string[] | string>): string 
 export const generateAIMatches = createServerFn()
   .inputValidator((data: { answers: Record<string, string[] | string> }) => data)
   .handler(async ({ data }) => {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) throw new Error("GEMINI_API_KEY not configured");
 
-    const client = new Anthropic({ apiKey });
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
     const surveyContext = buildSurveyContext(data.answers);
 
-    const prompt = `You are a career advisor generating personalized career match recommendations.
+    const prompt = `You are a career advisor. Based on this person's survey responses, generate 5-6 career matches that genuinely fit them. Only include careers that are truly relevant to their answers — if they answered around medicine and research, suggest medical/research careers. If they answered around tech and product, suggest tech careers. Never pad with unrelated options.
 
-Based on this person's survey responses:
+Survey responses:
 ${surveyContext}
 
-Generate exactly 6 career matches tailored specifically to these answers. Each match should be genuinely different and relevant to their stated values, skills, and situation.
+Return ONLY a valid JSON object with a "matches" array. Each match must have exactly these fields:
+{
+  "matches": [
+    {
+      "title": "specific role title",
+      "family": "one of: Product, Strategy, Finance, Engineering, Operations, Creative, People, Research, Medical, Legal",
+      "industry": ["2-3 specific industries"],
+      "blurb": "2-3 sentences explaining why this fits this specific person based on their answers",
+      "fit": integer between 50 and 96,
+      "salaryLow": number in thousands USD,
+      "salaryHigh": number in thousands USD,
+      "tcNote": "e.g. Base + bonus or TC incl. equity",
+      "transitionTime": "e.g. 3-6 months or 1-2 years",
+      "growth": "Hot" or "Steady" or "Cooling",
+      "remote": "Mostly remote" or "Hybrid" or "On-site heavy",
+      "nextSteps": ["2-3 concrete first actions"],
+      "watchOut": "1-2 sentences on the real risk for this specific person",
+      "tags": ["3-5 lowercase tags from: strategy, analytical, builder, people, operator, mission, creative, technical, research, medical, legal, finance"]
+    }
+  ]
+}
 
-Return a JSON object with a "matches" array. Each match must have these exact fields:
-- title: string (specific role title, e.g. "Senior Product Manager at FinTech Startups")
-- family: string (one of: Product, Strategy, Finance, Engineering, Operations, Creative, People, Research)
-- industry: string[] (2-3 specific industries, e.g. ["FinTech", "SaaS", "Big Tech"])
-- blurb: string (2-3 sentences explaining why this fits this person specifically, referencing their actual answers)
-- fit: number (integer 45-97, reflecting genuine alignment — top match should be 80+, range matters)
-- salaryLow: number (thousands USD base, realistic for mid-senior level)
-- salaryHigh: number (thousands USD total comp, realistic)
-- tcNote: string (e.g. "TC incl. equity" or "Base + bonus")
-- transitionTime: string (e.g. "3–6 months" or "1–2 years")
-- growth: "Cooling" | "Steady" | "Hot"
-- remote: "Mostly remote" | "Hybrid" | "On-site heavy"
-- nextSteps: string[] (2-3 concrete first actions)
-- watchOut: string (1-2 sentences on the real risk or surprise for this person specifically)
-- tags: string[] (3-5 lowercase tags like "strategy", "analytical", "builder", "people", "operator", "mission", "creative")
+Order by fit descending. Return only the JSON, no markdown, no explanation.`;
 
-Order matches from highest to lowest fit score. Make recommendations genuinely varied — don't cluster too many similar roles. Be honest about the watchout — it should be specific to this person's stated drains or risk tolerance.
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
 
-Return only the JSON object, no other text.`;
-
-    const message = await client.messages.create({
-      model: "claude-opus-4-7",
-      max_tokens: 4000,
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    const text = message.content[0].type === "text" ? message.content[0].text : "";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("No JSON in response");
 
     const parsed = JSON.parse(jsonMatch[0]) as { matches: AIMatch[] };
+    if (!parsed.matches?.length) throw new Error("Empty matches array");
     return parsed.matches;
   });
