@@ -14,7 +14,7 @@ export type Application = {
 };
 
 export type AppState = {
-  answers: Record<string, string>;
+  answers: Record<string, string[] | string>;
   compareIds: string[];
   applications: Application[];
   lastJD: string;

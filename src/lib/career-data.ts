@@ -3,77 +3,122 @@ export type SurveyQuestion = {
   id: string;
   prompt: string;
   helper?: string;
-  options: SurveyOption[];
+  type?: "multi" | "text";
+  minSelect?: number;
+  maxSelect?: number;
+  options?: SurveyOption[];
+  placeholder?: string;
 };
 
 export const surveyQuestions: SurveyQuestion[] = [
   {
-    id: "environment",
-    prompt: "Where do you do your best thinking?",
-    helper: "Pick the setting that genuinely energizes you, not the one that sounds impressive.",
+    id: "values",
+    prompt: "What matters most to you in work?",
+    helper: "Pick as many as feel honestly true. There are no wrong answers — just signal.",
+    type: "multi",
+    minSelect: 1,
     options: [
-      { value: "deep-focus", label: "Long stretches of deep, solo focus", tags: ["analytical", "builder"] },
-      { value: "collab", label: "Lively rooms full of people bouncing ideas", tags: ["people", "strategy"] },
-      { value: "field", label: "Out in the field, hands on real things", tags: ["operator", "people"] },
-      { value: "mixed", label: "A balance — some quiet, some collaboration", tags: ["strategy", "builder"] },
+      { value: "income", label: "High income", tags: ["strategy", "operator"] },
+      { value: "autonomy", label: "Autonomy & flexibility", tags: ["operator", "builder"] },
+      { value: "impact", label: "Making an impact", tags: ["mission", "strategy"] },
+      { value: "challenge", label: "Intellectual challenge", tags: ["analytical", "builder"] },
+      { value: "stability", label: "Stability & security", tags: ["analytical", "operator"] },
+      { value: "prestige", label: "Prestige & recognition", tags: ["strategy", "people"] },
+      { value: "balance", label: "Work-life balance", tags: ["operator", "analytical"] },
+      { value: "creative", label: "Creative freedom", tags: ["creative", "builder"] },
+      { value: "leadership", label: "Leadership & influence", tags: ["people", "strategy"] },
+      { value: "helping", label: "Helping people directly", tags: ["people", "mission"] },
     ],
   },
   {
-    id: "motivation",
-    prompt: "What gets you out of bed for work?",
+    id: "energizes",
+    prompt: "What kind of work energizes you?",
+    helper: "Choose every flavor of work that genuinely makes you lean in.",
+    type: "multi",
+    minSelect: 1,
     options: [
-      { value: "impact", label: "Improving lives at scale", tags: ["mission", "strategy"] },
-      { value: "craft", label: "Mastering a craft to the highest level", tags: ["builder", "analytical"] },
-      { value: "autonomy", label: "Autonomy and ownership", tags: ["operator", "strategy"] },
-      { value: "money", label: "Financial upside and security", tags: ["strategy", "operator"] },
+      { value: "problems", label: "Solving complex problems", tags: ["analytical", "builder"] },
+      { value: "relationships", label: "Building relationships", tags: ["people", "strategy"] },
+      { value: "systems", label: "Creating systems & structure", tags: ["builder", "operator"] },
+      { value: "communicating", label: "Communicating & presenting", tags: ["people", "creative"] },
+      { value: "leading", label: "Managing & leading teams", tags: ["people", "strategy"] },
+      { value: "hands-on", label: "Hands-on technical work", tags: ["builder", "analytical"] },
+      { value: "strategy", label: "Strategy & big picture thinking", tags: ["strategy", "analytical"] },
+      { value: "research", label: "Researching & learning", tags: ["analytical", "creative"] },
+      { value: "executing", label: "Executing & delivering", tags: ["operator", "builder"] },
+      { value: "innovating", label: "Innovating & experimenting", tags: ["builder", "creative"] },
     ],
   },
   {
-    id: "thinking",
-    prompt: "How do you naturally solve hard problems?",
+    id: "drains",
+    prompt: "What tends to drain you?",
+    helper: "These shape what to avoid. Be honest — your future self will thank you.",
+    type: "multi",
+    minSelect: 1,
     options: [
-      { value: "data", label: "Models and data, top-down", tags: ["analytical", "builder"] },
-      { value: "story", label: "Narrative and intuition", tags: ["creative", "people"] },
-      { value: "build", label: "Prototype, test, iterate", tags: ["builder", "operator"] },
-      { value: "talk", label: "Talk it through with stakeholders", tags: ["people", "strategy"] },
+      { value: "repetitive", label: "Repetitive tasks", tags: ["builder", "creative"] },
+      { value: "politics", label: "Office politics", tags: ["builder", "analytical"] },
+      { value: "context-switching", label: "Constant context-switching", tags: ["analytical", "builder"] },
+      { value: "bureaucracy", label: "Slow bureaucratic decisions", tags: ["operator", "builder"] },
+      { value: "pressure", label: "High-stakes pressure", tags: ["analytical", "operator"] },
+      { value: "isolation", label: "Working in isolation", tags: ["people", "strategy"] },
+      { value: "managing", label: "Managing people", tags: ["builder", "analytical"] },
+      { value: "unclear", label: "Unclear direction", tags: ["operator", "analytical"] },
+      { value: "no-creative", label: "No creative input", tags: ["creative", "builder"] },
+      { value: "travel", label: "Too much travel", tags: ["analytical", "builder"] },
+    ],
+  },
+  {
+    id: "skills",
+    prompt: "Where do your strongest skills lie?",
+    helper: "Pick every area where you've clearly outperformed peers.",
+    type: "multi",
+    minSelect: 1,
+    options: [
+      { value: "technical", label: "Technical / Engineering", tags: ["builder", "analytical"] },
+      { value: "data", label: "Data & analysis", tags: ["analytical", "builder"] },
+      { value: "writing", label: "Communication & writing", tags: ["creative", "people"] },
+      { value: "product", label: "Product & strategy", tags: ["strategy", "builder"] },
+      { value: "sales", label: "Sales & persuasion", tags: ["people", "strategy"] },
+      { value: "design", label: "Design & creativity", tags: ["creative", "builder"] },
+      { value: "ops", label: "Operations & execution", tags: ["operator", "people"] },
+      { value: "research", label: "Research & medicine", tags: ["analytical", "mission"] },
+      { value: "finance", label: "Finance & business", tags: ["analytical", "strategy"] },
+      { value: "teaching", label: "Teaching & mentorship", tags: ["people", "mission"] },
     ],
   },
   {
     id: "risk",
-    prompt: "How do you feel about risk?",
+    prompt: "What's your relationship with risk?",
+    helper: "Pick the statement(s) that genuinely describe you.",
+    type: "multi",
+    minSelect: 1,
     options: [
-      { value: "high", label: "Bring it on — high variance, high reward", tags: ["strategy", "builder"] },
-      { value: "medium", label: "Calculated bets with a real downside", tags: ["operator", "analytical"] },
-      { value: "low", label: "Stable ground, predictable upside", tags: ["analytical", "people"] },
-    ],
-  },
-  {
-    id: "people",
-    prompt: "How much of your day should involve people?",
-    options: [
-      { value: "lots", label: "Most of it — meetings, coaching, pitching", tags: ["people", "strategy"] },
-      { value: "some", label: "Half and half", tags: ["operator", "people"] },
-      { value: "little", label: "Mostly heads-down with focused syncs", tags: ["analytical", "builder"] },
+      { value: "stability", label: "I want stability — predictable income and clear path", tags: ["analytical", "operator"] },
+      { value: "moderate", label: "I'm open to moderate risk for upside", tags: ["operator", "strategy"] },
+      { value: "uncertainty", label: "I thrive in uncertainty and love betting on myself", tags: ["strategy", "builder"] },
+      { value: "career-risk", label: "Low financial risk, high career risk is fine", tags: ["builder", "creative"] },
     ],
   },
   {
     id: "horizon",
-    prompt: "What time horizon do you enjoy thinking on?",
+    prompt: "What's your career horizon right now?",
+    helper: "This helps tune urgency, not match — pick what's true today.",
+    type: "multi",
+    minSelect: 1,
     options: [
-      { value: "today", label: "Today — fast loops, ship now", tags: ["operator", "builder"] },
-      { value: "quarter", label: "Quarters — projects and delivery", tags: ["builder", "strategy"] },
-      { value: "years", label: "Years — vision and systems", tags: ["strategy", "analytical"] },
+      { value: "now", label: "Next role in < 6 months", tags: ["operator", "builder"] },
+      { value: "transition", label: "Planning a 1–2 year transition", tags: ["strategy", "operator"] },
+      { value: "exploring", label: "Exploring with no urgency", tags: ["analytical", "creative"] },
+      { value: "deciding", label: "Deciding between two specific paths already", tags: ["strategy", "analytical"] },
     ],
   },
   {
-    id: "learning",
-    prompt: "What kind of learning excites you?",
-    options: [
-      { value: "tech", label: "New technical primitives and tools", tags: ["builder", "analytical"] },
-      { value: "human", label: "Human behavior and psychology", tags: ["people", "creative"] },
-      { value: "market", label: "Markets, business models, strategy", tags: ["strategy", "operator"] },
-      { value: "craft", label: "Aesthetic craft and storytelling", tags: ["creative", "people"] },
-    ],
+    id: "situation",
+    prompt: "Tell us about your current situation",
+    helper: "Optional — a few sentences about where you are, what you've tried, and what's making the decision hard. We'll use this to color your recommendations.",
+    type: "text",
+    placeholder: "e.g. I've been a senior engineer for 6 years, considering moving into product or starting something on my own. Worried about pay cut and identity shift...",
   },
 ];
 
@@ -252,14 +297,20 @@ export const careers: Career[] = [
 
 export const allTags = ["analytical", "builder", "strategy", "people", "operator", "creative", "mission"] as const;
 
-export function scoreCareers(answers: Record<string, string>) {
+export type SurveyAnswers = Record<string, string[] | string>;
+
+export function scoreCareers(answers: SurveyAnswers) {
   const tagCounts: Record<string, number> = {};
   for (const q of surveyQuestions) {
+    if (q.type === "text" || !q.options) continue;
     const ans = answers[q.id];
     if (!ans) continue;
-    const opt = q.options.find((o) => o.value === ans);
-    if (!opt) continue;
-    for (const t of opt.tags) tagCounts[t] = (tagCounts[t] || 0) + 1;
+    const values = Array.isArray(ans) ? ans : [ans];
+    for (const v of values) {
+      const opt = q.options.find((o) => o.value === v);
+      if (!opt) continue;
+      for (const t of opt.tags) tagCounts[t] = (tagCounts[t] || 0) + 1;
+    }
   }
   const totalAnswered = Object.values(tagCounts).reduce((a, b) => a + b, 0) || 1;
 
@@ -267,7 +318,6 @@ export function scoreCareers(answers: Record<string, string>) {
     .map((c) => {
       const overlap = c.tags.reduce((sum, t) => sum + (tagCounts[t] || 0), 0);
       const raw = overlap / Math.max(totalAnswered, c.tags.length);
-      // map to a friendly 55–98 range so even partial fills feel meaningful
       const fit = Math.min(98, Math.round(55 + raw * 60));
       return { career: c, fit };
     })
@@ -278,7 +328,6 @@ export function analyzeJD(text: string, target?: Career) {
   const lower = text.toLowerCase();
   const allKeywords = Array.from(new Set(careers.flatMap((c) => c.sampleJDKeywords)));
   const found = allKeywords.filter((k) => lower.includes(k));
-  // Match against careers
   const careerScores = careers.map((c) => {
     const hits = c.sampleJDKeywords.filter((k) => lower.includes(k));
     return { career: c, hits };
@@ -287,7 +336,6 @@ export function analyzeJD(text: string, target?: Career) {
   const targetCareer = target ?? best.career;
   const matched = targetCareer.sampleJDKeywords.filter((k) => lower.includes(k));
   const gaps = targetCareer.sampleJDKeywords.filter((k) => !lower.includes(k));
-  // pick "your strengths" from coreSkills present-ish in text
   const strengthHits = targetCareer.coreSkills.filter((s) => lower.includes(s.toLowerCase().split(" ")[0]));
   const fitPct = Math.min(98, 50 + matched.length * 8);
   return { matched, gaps, strengthHits, fitPct, best: best.career, found, targetCareer };
