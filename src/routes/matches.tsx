@@ -23,6 +23,24 @@ function MatchesPage() {
   const top = ranked[0];
   const rest = ranked.slice(1);
 
+  // Aggregate industry rankings: weight each industry by the fit % of every
+  // matched career it appears in, then normalize to a 0–100 score.
+  const industryRankings = useMemo(() => {
+    const totals: Record<string, { score: number; count: number }> = {};
+    for (const r of ranked) {
+      for (const ind of r.career.industry) {
+        if (!totals[ind]) totals[ind] = { score: 0, count: 0 };
+        totals[ind].score += r.fit;
+        totals[ind].count += 1;
+      }
+    }
+    const max = Math.max(1, ...Object.values(totals).map((t) => t.score));
+    return Object.entries(totals)
+      .map(([name, t]) => ({ name, score: Math.round((t.score / max) * 100), count: t.count }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 12);
+  }, [ranked]);
+
   const toggleCompare = (id: string) => {
     update((s) => {
       const exists = s.compareIds.includes(id);
@@ -74,11 +92,6 @@ function MatchesPage() {
             <div className="text-[11px] uppercase tracking-[0.22em] opacity-70 font-semibold mb-3">Best alignment</div>
             <h2 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4">{top.career.title}</h2>
             <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-4">{top.career.blurb}</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {top.career.industry.map((ind) => (
-                <span key={ind} className="text-[11px] px-3 py-1 rounded-full bg-brand-foreground/20 border border-brand-foreground/30 font-semibold">{ind}</span>
-              ))}
-            </div>
             <div className="flex flex-wrap gap-2 mb-8">
               {top.career.tags.map((t) => (
                 <span key={t} className="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full bg-brand-foreground/10 border border-brand-foreground/20">{t}</span>
@@ -131,6 +144,29 @@ function MatchesPage() {
         </div>
       </article>
 
+      {/* Industry rankings */}
+      <section className="rounded-3xl bg-card border border-border p-6 md:p-8 mb-10">
+        <header className="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.22em] text-brand-accent font-semibold mb-2">Phase 02b · Industry signal</div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Industries that fit your profile</h2>
+            <p className="text-sm text-muted-foreground mt-1">Aggregated from your top {ranked.length} matches, weighted by fit.</p>
+          </div>
+        </header>
+        <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+          {industryRankings.map((ind, i) => (
+            <li key={ind.name} className="flex items-center gap-3">
+              <span className="font-mono text-[11px] text-muted-foreground/70 w-6 tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-sm font-medium text-foreground w-44 shrink-0 truncate">{ind.name}</span>
+              <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-brand-accent rounded-full" style={{ width: `${ind.score}%` }} />
+              </div>
+              <span className="font-mono text-[11px] text-brand-accent tabular-nums w-8 text-right">{ind.score}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* Remaining top matches */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {rest.map((r) => {
@@ -143,11 +179,6 @@ function MatchesPage() {
               </div>
               <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.career.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{r.career.blurb}</p>
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {r.career.industry.map((ind) => (
-                  <span key={ind} className="text-[10px] px-2 py-0.5 rounded-md bg-brand-soft text-brand-accent font-semibold tracking-wide">{ind}</span>
-                ))}
-              </div>
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {r.career.tags.slice(0, 3).map((t) => (
                   <Badge key={t} variant="secondary" className="text-[10px] uppercase tracking-wider font-medium">{t}</Badge>

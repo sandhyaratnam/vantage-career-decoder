@@ -1081,7 +1081,7 @@ export function scoreCareers(answers: SurveyAnswers) {
       for (const t of opt.tags) tagCounts[t] = (tagCounts[t] || 0) + 1;
     }
   }
-  const totalTagHits = Object.values(tagCounts).reduce((a, b) => a + b, 0) || 1;
+  const maxTagCount = Math.max(1, ...Object.values(tagCounts));
 
   // Phase 2: flat sets of selected values per question
   const selectedByQ: Record<string, Set<string>> = {};
@@ -1095,10 +1095,13 @@ export function scoreCareers(answers: SurveyAnswers) {
 
   return careers
     .map((c) => {
-      const overlap = c.tags.reduce((sum, t) => sum + (tagCounts[t] || 0), 0);
-      const baseRaw = overlap / Math.max(totalTagHits, c.tags.length);
+      // Average per-tag hit rate, normalized — prevents careers with more
+      // generic tags from auto-winning over careers with niche, well-matched tags.
+      const avgPerTag = c.tags.reduce((sum, t) => sum + (tagCounts[t] || 0), 0) / Math.max(1, c.tags.length);
+      const baseRaw = avgPerTag / maxTagCount;
 
-      // Phase 3: affinity boost/drain deltas
+      // Phase 3: affinity boost/drain deltas (weighted heavier than base so
+      // explicit signals dominate generic tag overlap)
       const rule = affinityRules[c.id];
       let affinityDelta = 0;
 
@@ -1117,12 +1120,12 @@ export function scoreCareers(answers: SurveyAnswers) {
         }
         const boostRatio = boostTotal > 0 ? boostHits / boostTotal : 0;
         const drainRatio = drainTotal > 0 ? drainHits / drainTotal : 0;
-        affinityDelta = boostRatio * 0.35 - drainRatio * 0.25;
+        affinityDelta = boostRatio * 0.55 - drainRatio * 0.45;
       }
 
-      const combined = Math.max(0, Math.min(1, baseRaw + affinityDelta));
+      const combined = Math.max(0, Math.min(1, baseRaw * 0.5 + affinityDelta + 0.1));
       const fit = hasAnyAnswers
-        ? Math.min(98, Math.max(42, Math.round(45 + combined * 53)))
+        ? Math.min(98, Math.max(42, Math.round(40 + combined * 58)))
         : 50;
 
       return { career: c, fit };
