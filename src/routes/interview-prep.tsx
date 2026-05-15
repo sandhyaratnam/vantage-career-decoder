@@ -76,7 +76,7 @@ function PrepPage() {
           </div>
 
           <div className="space-y-4">
-            {career.interviewQuestions.map((q, i) => (
+            {(career.interviewQuestions ?? []).map((q, i) => (
               <article key={i} className="rounded-2xl bg-card border border-border p-7 hover:border-brand-accent/40 transition-colors">
                 <div className="flex items-start gap-4 mb-5">
                   <div className="size-9 rounded-lg bg-brand-soft text-brand-accent grid place-items-center shrink-0 font-mono text-sm font-bold">

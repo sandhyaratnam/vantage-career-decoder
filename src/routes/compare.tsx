@@ -57,13 +57,13 @@ function ComparePage() {
     {
       label: "Core skills",
       render: (c) => (
-        <ul className="space-y-1.5">{c.coreSkills.map((s) => <li key={s} className="text-sm flex gap-2"><span className="text-brand-accent">·</span>{s}</li>)}</ul>
+        <ul className="space-y-1.5">{(c.coreSkills ?? []).map((s) => <li key={s} className="text-sm flex gap-2"><span className="text-brand-accent">·</span>{s}</li>)}</ul>
       ),
     },
     {
       label: "Tangents",
       render: (c) => (
-        <div className="flex flex-wrap gap-1.5">{c.tangents.map((t) => <span key={t} className="text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-accent text-accent-foreground">{t}</span>)}</div>
+        <div className="flex flex-wrap gap-1.5">{(c.tangents ?? []).map((t) => <span key={t} className="text-[11px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-accent text-accent-foreground">{t}</span>)}</div>
       ),
     },
   ];
