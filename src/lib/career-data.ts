@@ -1132,17 +1132,17 @@ export function scoreCareers(answers: SurveyAnswers) {
 
 export function analyzeJD(text: string, target?: Career) {
   const lower = text.toLowerCase();
-  const allKeywords = Array.from(new Set(careers.flatMap((c) => c.sampleJDKeywords)));
+  const allKeywords = Array.from(new Set(careers.flatMap((c) => c.sampleJDKeywords ?? [])));
   const found = allKeywords.filter((k) => lower.includes(k));
   const careerScores = careers.map((c) => {
-    const hits = c.sampleJDKeywords.filter((k) => lower.includes(k));
+    const hits = (c.sampleJDKeywords ?? []).filter((k) => lower.includes(k));
     return { career: c, hits };
   }).sort((a, b) => b.hits.length - a.hits.length);
   const best = careerScores[0];
   const targetCareer = target ?? best.career;
-  const matched = targetCareer.sampleJDKeywords.filter((k) => lower.includes(k));
-  const gaps = targetCareer.sampleJDKeywords.filter((k) => !lower.includes(k));
-  const strengthHits = targetCareer.coreSkills.filter((s) => lower.includes(s.toLowerCase().split(" ")[0]));
+  const matched = (targetCareer.sampleJDKeywords ?? []).filter((k) => lower.includes(k));
+  const gaps = (targetCareer.sampleJDKeywords ?? []).filter((k) => !lower.includes(k));
+  const strengthHits = (targetCareer.coreSkills ?? []).filter((s) => lower.includes(s.toLowerCase().split(" ")[0]));
   const fitPct = Math.min(98, 50 + matched.length * 8);
   return { matched, gaps, strengthHits, fitPct, best: best.career, found, targetCareer };
 }
