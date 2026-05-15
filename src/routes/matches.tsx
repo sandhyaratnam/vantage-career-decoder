@@ -144,6 +144,29 @@ function MatchesPage() {
         </div>
       </article>
 
+      {/* Industry rankings */}
+      <section className="rounded-3xl bg-card border border-border p-6 md:p-8 mb-10">
+        <header className="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.22em] text-brand-accent font-semibold mb-2">Phase 02b · Industry signal</div>
+            <h2 className="font-display text-2xl md:text-3xl font-bold tracking-tight">Industries that fit your profile</h2>
+            <p className="text-sm text-muted-foreground mt-1">Aggregated from your top {ranked.length} matches, weighted by fit.</p>
+          </div>
+        </header>
+        <ul className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
+          {industryRankings.map((ind, i) => (
+            <li key={ind.name} className="flex items-center gap-3">
+              <span className="font-mono text-[11px] text-muted-foreground/70 w-6 tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              <span className="text-sm font-medium text-foreground w-44 shrink-0 truncate">{ind.name}</span>
+              <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
+                <div className="h-full bg-brand-accent rounded-full" style={{ width: `${ind.score}%` }} />
+              </div>
+              <span className="font-mono text-[11px] text-brand-accent tabular-nums w-8 text-right">{ind.score}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
       {/* Remaining top matches */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {rest.map((r) => {
@@ -156,11 +179,6 @@ function MatchesPage() {
               </div>
               <h3 className="font-display text-xl font-bold text-foreground mb-2">{r.career.title}</h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-3 flex-1">{r.career.blurb}</p>
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {r.career.industry.map((ind) => (
-                  <span key={ind} className="text-[10px] px-2 py-0.5 rounded-md bg-brand-soft text-brand-accent font-semibold tracking-wide">{ind}</span>
-                ))}
-              </div>
               <div className="flex flex-wrap gap-1.5 mb-4">
                 {r.career.tags.slice(0, 3).map((t) => (
                   <Badge key={t} variant="secondary" className="text-[10px] uppercase tracking-wider font-medium">{t}</Badge>
