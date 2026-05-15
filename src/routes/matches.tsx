@@ -23,6 +23,24 @@ function MatchesPage() {
   const top = ranked[0];
   const rest = ranked.slice(1);
 
+  // Aggregate industry rankings: weight each industry by the fit % of every
+  // matched career it appears in, then normalize to a 0–100 score.
+  const industryRankings = useMemo(() => {
+    const totals: Record<string, { score: number; count: number }> = {};
+    for (const r of ranked) {
+      for (const ind of r.career.industry) {
+        if (!totals[ind]) totals[ind] = { score: 0, count: 0 };
+        totals[ind].score += r.fit;
+        totals[ind].count += 1;
+      }
+    }
+    const max = Math.max(1, ...Object.values(totals).map((t) => t.score));
+    return Object.entries(totals)
+      .map(([name, t]) => ({ name, score: Math.round((t.score / max) * 100), count: t.count }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 12);
+  }, [ranked]);
+
   const toggleCompare = (id: string) => {
     update((s) => {
       const exists = s.compareIds.includes(id);
