@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check, Linkedin, ExternalLink } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check, Linkedin, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useAppState, type Profile } from "@/lib/store";
+import { fetchLinkedInProfile } from "@/lib/linkedin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile")({
@@ -32,10 +34,46 @@ function ProfilePage() {
   const { state, update } = useAppState();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
+  const fetchLinkedIn = useServerFn(fetchLinkedInProfile);
   const profile = state.profile;
 
   const setField = <K extends keyof Profile>(key: K, value: Profile[K]) =>
     update((s) => ({ ...s, profile: { ...s.profile, [key]: value } }));
+
+  const populateFromLinkedIn = async (url: string) => {
+    if (!url.includes("linkedin.com/in/")) {
+      toast.error("Enter a valid LinkedIn profile URL", { description: "e.g. https://linkedin.com/in/yourhandle" });
+      return;
+    }
+    setLinkedinLoading(true);
+    try {
+      const result = await fetchLinkedIn({ data: { url } });
+      if (result.error || !result.profile) {
+        toast.error("Couldn't pull from LinkedIn", { description: result.error ?? "Try pasting your About text manually." });
+        return;
+      }
+      const p = result.profile;
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          linkedinUrl: url,
+          name: p.name || s.profile.name,
+          currentRole: p.currentRole || s.profile.currentRole,
+          yearsExperience: p.yearsExperience || s.profile.yearsExperience,
+          education: p.education || s.profile.education,
+          location: p.location || s.profile.location,
+          about: p.about || s.profile.about,
+        },
+      }));
+      toast.success("LinkedIn imported", { description: "About-you fields populated. Edit anything that's off." });
+    } catch (e) {
+      toast.error("LinkedIn import failed", { description: e instanceof Error ? e.message : "Unknown error" });
+    } finally {
+      setLinkedinLoading(false);
+    }
+  };
 
   const onFile = async (file: File | null) => {
     if (!file) return;
@@ -151,6 +189,13 @@ function ProfilePage() {
                   className="bg-background border-border h-10 text-sm"
                 />
                 <Button
+                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
+                  disabled={linkedinLoading}
+                  className="w-full rounded-xl h-10 bg-[#0A66C2] hover:bg-[#004182] text-white text-xs"
+                >
+                  {linkedinLoading ? <><Loader2 className="size-3.5 mr-2 animate-spin" /> Importing…</> : <>Re-import from LinkedIn</>}
+                </Button>
+                <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => { setField("linkedinUrl", ""); toast.success("LinkedIn disconnected"); }}
@@ -168,20 +213,18 @@ function ProfilePage() {
                   className="bg-background border-border h-11"
                 />
                 <Button
-                  onClick={() => {
-                    const url = profile.linkedinUrl.trim();
-                    if (!url.includes("linkedin.com")) {
-                      toast.error("Enter a valid LinkedIn URL");
-                      return;
-                    }
-                    toast.success("LinkedIn connected", { description: "Your profile URL is saved." });
-                  }}
+                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
+                  disabled={linkedinLoading}
                   className="w-full rounded-xl h-11 bg-[#0A66C2] hover:bg-[#004182] text-white"
                 >
-                  <Linkedin className="size-4 mr-2" /> Connect LinkedIn
+                  {linkedinLoading ? (
+                    <><Loader2 className="size-4 mr-2 animate-spin" /> Importing profile…</>
+                  ) : (
+                    <><Linkedin className="size-4 mr-2" /> Connect & auto-fill</>
+                  )}
                 </Button>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Paste your LinkedIn profile URL. It stays in your browser only.
+                  We'll try to pull your name, role, education and bio. LinkedIn often blocks public scraping — if fields stay blank, fill them manually.
                 </p>
               </div>
             )}

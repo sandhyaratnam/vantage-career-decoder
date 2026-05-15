@@ -93,6 +93,25 @@ function RootShell({ children }: { children: React.ReactNode }) {
   );
 }
 
+const PAGE_TITLES: Record<string, string> = {
+  "/": "Survey",
+  "/profile": "Profile",
+  "/matches": "Matches",
+  "/compare": "Compare",
+  "/jd-analysis": "JD Analysis",
+  "/applications": "Applications",
+  "/interview-prep": "Interview Prep",
+};
+
+function HeaderTitle() {
+  const router = useRouter();
+  const pathname = router.state.location.pathname;
+  const title = PAGE_TITLES[pathname] ?? "Vantage";
+  return (
+    <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-medium">{title}</span>
+  );
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
@@ -104,7 +123,7 @@ function RootComponent() {
             <header className="h-14 flex items-center gap-2 border-b border-border px-4 sticky top-0 bg-background/80 backdrop-blur-md z-30">
               <SidebarTrigger />
               <div className="h-5 w-px bg-border mx-1" />
-              <span className="text-xs uppercase tracking-[0.18em] text-muted-foreground font-medium">Career decision OS</span>
+              <HeaderTitle />
             </header>
             <main className="flex-1 min-w-0">
               <Outlet />
