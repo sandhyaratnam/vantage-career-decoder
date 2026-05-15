@@ -92,11 +92,6 @@ function MatchesPage() {
             <div className="text-[11px] uppercase tracking-[0.22em] opacity-70 font-semibold mb-3">Best alignment</div>
             <h2 className="font-display text-4xl md:text-5xl font-bold leading-[1.05] mb-4">{top.career.title}</h2>
             <p className="text-brand-foreground/80 text-lg leading-relaxed max-w-xl mb-4">{top.career.blurb}</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {top.career.industry.map((ind) => (
-                <span key={ind} className="text-[11px] px-3 py-1 rounded-full bg-brand-foreground/20 border border-brand-foreground/30 font-semibold">{ind}</span>
-              ))}
-            </div>
             <div className="flex flex-wrap gap-2 mb-8">
               {top.career.tags.map((t) => (
                 <span key={t} className="text-[11px] uppercase tracking-wider px-3 py-1 rounded-full bg-brand-foreground/10 border border-brand-foreground/20">{t}</span>
