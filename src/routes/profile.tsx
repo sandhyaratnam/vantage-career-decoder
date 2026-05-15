@@ -34,10 +34,46 @@ function ProfilePage() {
   const { state, update } = useAppState();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [linkedinLoading, setLinkedinLoading] = useState(false);
+  const fetchLinkedIn = useServerFn(fetchLinkedInProfile);
   const profile = state.profile;
 
   const setField = <K extends keyof Profile>(key: K, value: Profile[K]) =>
     update((s) => ({ ...s, profile: { ...s.profile, [key]: value } }));
+
+  const populateFromLinkedIn = async (url: string) => {
+    if (!url.includes("linkedin.com/in/")) {
+      toast.error("Enter a valid LinkedIn profile URL", { description: "e.g. https://linkedin.com/in/yourhandle" });
+      return;
+    }
+    setLinkedinLoading(true);
+    try {
+      const result = await fetchLinkedIn({ data: { url } });
+      if (result.error || !result.profile) {
+        toast.error("Couldn't pull from LinkedIn", { description: result.error ?? "Try pasting your About text manually." });
+        return;
+      }
+      const p = result.profile;
+      update((s) => ({
+        ...s,
+        profile: {
+          ...s.profile,
+          linkedinUrl: url,
+          name: p.name || s.profile.name,
+          currentRole: p.currentRole || s.profile.currentRole,
+          yearsExperience: p.yearsExperience || s.profile.yearsExperience,
+          education: p.education || s.profile.education,
+          location: p.location || s.profile.location,
+          about: p.about || s.profile.about,
+        },
+      }));
+      toast.success("LinkedIn imported", { description: "About-you fields populated. Edit anything that's off." });
+    } catch (e) {
+      toast.error("LinkedIn import failed", { description: e instanceof Error ? e.message : "Unknown error" });
+    } finally {
+      setLinkedinLoading(false);
+    }
+  };
 
   const onFile = async (file: File | null) => {
     if (!file) return;
