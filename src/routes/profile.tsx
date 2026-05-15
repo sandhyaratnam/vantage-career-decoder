@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check, Linkedin, ExternalLink } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { ArrowRight, Upload, FileText, Trash2, UserCircle2, Check, Linkedin, ExternalLink, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useAppState, type Profile } from "@/lib/store";
+import { fetchLinkedInProfile } from "@/lib/linkedin.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/profile")({
