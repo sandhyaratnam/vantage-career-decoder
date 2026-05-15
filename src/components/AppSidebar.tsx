@@ -51,22 +51,6 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent className="px-2">
-        {/* Profile — pinned above the flow */}
-        <SidebarGroup className="pb-1">
-          <SidebarGroupContent>
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/profile"} tooltip="Profile" className="h-11 rounded-lg data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground">
-                  <Link to="/profile" className="flex items-center gap-3">
-                    <UserCircle2 className="size-4 shrink-0" />
-                    {!collapsed && <span className="text-sm">Profile</span>}
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         <SidebarGroup>
           <SidebarGroupLabel className="text-[10px] uppercase tracking-[0.18em] text-sidebar-foreground/40">
             The Flow
@@ -91,6 +75,22 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Profile — pinned below the flow */}
+        <SidebarGroup className="mt-auto pt-2">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/profile"} tooltip="Profile" className="h-11 rounded-lg data-[active=true]:bg-sidebar-accent data-[active=true]:text-sidebar-accent-foreground">
+                  <Link to="/profile" className="flex items-center gap-3">
+                    <UserCircle2 className="size-4 shrink-0" />
+                    {!collapsed && <span className="text-sm">Profile</span>}
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
