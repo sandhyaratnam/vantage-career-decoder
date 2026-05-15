@@ -189,6 +189,13 @@ function ProfilePage() {
                   className="bg-background border-border h-10 text-sm"
                 />
                 <Button
+                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
+                  disabled={linkedinLoading}
+                  className="w-full rounded-xl h-10 bg-[#0A66C2] hover:bg-[#004182] text-white text-xs"
+                >
+                  {linkedinLoading ? <><Loader2 className="size-3.5 mr-2 animate-spin" /> Importing…</> : <>Re-import from LinkedIn</>}
+                </Button>
+                <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => { setField("linkedinUrl", ""); toast.success("LinkedIn disconnected"); }}
@@ -206,20 +213,18 @@ function ProfilePage() {
                   className="bg-background border-border h-11"
                 />
                 <Button
-                  onClick={() => {
-                    const url = profile.linkedinUrl.trim();
-                    if (!url.includes("linkedin.com")) {
-                      toast.error("Enter a valid LinkedIn URL");
-                      return;
-                    }
-                    toast.success("LinkedIn connected", { description: "Your profile URL is saved." });
-                  }}
+                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
+                  disabled={linkedinLoading}
                   className="w-full rounded-xl h-11 bg-[#0A66C2] hover:bg-[#004182] text-white"
                 >
-                  <Linkedin className="size-4 mr-2" /> Connect LinkedIn
+                  {linkedinLoading ? (
+                    <><Loader2 className="size-4 mr-2 animate-spin" /> Importing profile…</>
+                  ) : (
+                    <><Linkedin className="size-4 mr-2" /> Connect & auto-fill</>
+                  )}
                 </Button>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Paste your LinkedIn profile URL. It stays in your browser only.
+                  We'll try to pull your name, role, education and bio. LinkedIn often blocks public scraping — if fields stay blank, fill them manually.
                 </p>
               </div>
             )}
