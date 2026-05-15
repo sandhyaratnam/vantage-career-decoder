@@ -137,11 +137,11 @@ export type Career = {
   watchOut: string;
   growth: "Cooling" | "Steady" | "Hot";
   remote: "Mostly remote" | "Hybrid" | "On-site heavy";
-  dayInLife: string;
-  coreSkills: string[];
-  tangents: string[];
-  sampleJDKeywords: string[];
-  interviewQuestions: { q: string; focus: string; tip: string }[];
+  dayInLife?: string;
+  coreSkills?: string[];
+  tangents?: string[];
+  sampleJDKeywords?: string[];
+  interviewQuestions?: { q: string; focus: string; tip: string }[];
 };
 
 export const careers: Career[] = [
