@@ -49,7 +49,7 @@ export const generateAIMatches = createServerFn()
 Survey responses:
 ${surveyContext}
 
-Order matches by fit descending.`;
+Order matches by fit descending. IMPORTANT: keep the "title" field clean — just the role name (e.g. "Technical Product Manager", "Venture Capital Associate"). Do NOT append industries, sectors, or company-type qualifiers in parentheses. Industries belong only in the "industry" array.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
