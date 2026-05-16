@@ -49,7 +49,11 @@ export const fetchLinkedInProfile = createServerFn({ method: "POST" })
     const handle = handleMatch?.[1] ?? "";
 
     const prompt = `Extract a professional profile from the LinkedIn page text below.
-If the page is a login wall or has no usable profile info, infer plausible defaults from the handle "${handle}" only as a starting point and leave fields empty if you genuinely can't tell. Never fabricate companies or schools — leave fields blank if unknown.
+RULES:
+- Only return information that is explicitly present in the page text.
+- If the page is a login wall, captcha, or generic LinkedIn marketing text with no real profile data, return ALL fields as empty strings.
+- Never invent companies, schools, titles, or locations from the handle "${handle}" or from general knowledge.
+- "about" must be a direct paraphrase of profile content, not a guess.
 
 PAGE TEXT:
 ${pageText || "(empty — page was blocked)"}`;

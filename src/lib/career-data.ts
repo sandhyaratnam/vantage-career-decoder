@@ -147,7 +147,7 @@ export type Career = {
 export const careers: Career[] = [
   {
     id: "tech-pm",
-    title: "Technical Product Manager (FinTech / Big Tech)",
+    title: "Technical Product Manager",
     family: "Product",
     industry: ["FinTech", "Big Tech", "SaaS"],
     blurb: "The natural pivot for a strong engineer with strategic chops. TPM roles at places like Stripe, Plaid, Google, or Amazon reward people who can write a spec and read a stack trace in the same hour.",
@@ -169,7 +169,7 @@ export const careers: Career[] = [
   },
   {
     id: "strategy-ops",
-    title: "Strategy & Operations Manager (Tech / FinTech)",
+    title: "Strategy & Operations Manager",
     family: "Strategy",
     industry: ["Tech", "FinTech", "E-commerce", "Marketplace"],
     blurb: "Tailor-made for MBA + technical backgrounds. Strat & Ops at Uber, Airbnb, Block, or Robinhood gets you ambiguous, high-leverage problems and exposure to executive decision-making early.",
@@ -190,7 +190,7 @@ export const careers: Career[] = [
   },
   {
     id: "vc-associate",
-    title: "Venture Capital Associate / Investor (FinTech focus)",
+    title: "Venture Capital Associate / Investor",
     family: "Finance",
     industry: ["Venture Capital", "Private Equity", "FinTech"],
     blurb: "Engineer + top-MBA + bank-domain expertise is exactly the operator profile fintech and infrastructure VCs recruit for. Rewards strategic pattern-matching and crisp written synthesis.",
@@ -211,7 +211,7 @@ export const careers: Career[] = [
   },
   {
     id: "corp-strategy",
-    title: "Product / Corporate Strategy at a Bank or FinTech",
+    title: "Product / Corporate Strategy",
     family: "Strategy",
     industry: ["Financial Services", "FinTech", "Banking"],
     blurb: "Stay adjacent to financial services but move into an internal strategy function (Chase strategy, Visa product strategy, PayPal corp dev). Leverages domain knowledge and accelerates the path to VP / Director.",
@@ -231,7 +231,7 @@ export const careers: Career[] = [
   },
   {
     id: "founder-fintech",
-    title: "Founder / Co-Founder (FinTech or B2B SaaS)",
+    title: "Founder / Co-Founder",
     family: "Entrepreneurship",
     industry: ["FinTech", "B2B SaaS", "Early-Stage Startup"],
     blurb: "Engineering chops + MBA from a strong entrepreneurship program + moderate risk tolerance is a credible founder profile — especially for a problem you discovered inside a major bank.",
