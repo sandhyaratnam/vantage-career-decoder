@@ -210,7 +210,7 @@ function MatchesPage() {
                 <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-amber-400 font-semibold mb-1">
                   <AlertTriangle className="size-3" /> Watch out
                 </div>
-                <p className="text-[11px] text-foreground/75 leading-relaxed line-clamp-3">{r.career.watchOut}</p>
+                <p className="text-[11px] text-foreground/75 leading-relaxed">{r.career.watchOut}</p>
               </div>
               <div className="flex items-center justify-end pt-3 border-t border-border">
                 <Button
