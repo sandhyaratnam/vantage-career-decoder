@@ -163,71 +163,31 @@ function ProfilePage() {
         {/* LinkedIn + Resume column */}
         <aside className="flex flex-col gap-6">
 
-          {/* LinkedIn connect */}
-          <div className="rounded-2xl bg-card border border-border p-6 md:p-8">
-            <div className="flex items-center gap-2.5 mb-6">
+          {/* LinkedIn auto-fill (compact) */}
+          <div className="rounded-2xl bg-card border border-border p-6">
+            <div className="flex items-center gap-2.5 mb-4">
               <div className="size-9 rounded-lg bg-[#0A66C2]/10 text-[#0A66C2] grid place-items-center">
                 <Linkedin className="size-5" />
               </div>
               <h2 className="font-display text-lg font-bold">LinkedIn</h2>
             </div>
-            {profile.linkedinUrl ? (
-              <div className="space-y-3">
-                <div className="rounded-xl border border-border bg-background p-3 flex items-center gap-3">
-                  <div className="size-8 rounded-lg bg-[#0A66C2]/10 text-[#0A66C2] grid place-items-center shrink-0">
-                    <Check className="size-4" />
-                  </div>
-                  <span className="text-sm text-foreground/80 truncate flex-1">{profile.linkedinUrl}</span>
-                  <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-brand-accent transition-colors">
-                    <ExternalLink className="size-4" />
-                  </a>
-                </div>
-                <Input
-                  value={profile.linkedinUrl}
-                  onChange={(e) => setField("linkedinUrl", e.target.value)}
-                  placeholder="https://linkedin.com/in/yourhandle"
-                  className="bg-background border-border h-10 text-sm"
-                />
-                <Button
-                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
-                  disabled={linkedinLoading}
-                  className="w-full rounded-xl h-10 bg-[#0A66C2] hover:bg-[#004182] text-white text-xs"
-                >
-                  {linkedinLoading ? <><Loader2 className="size-3.5 mr-2 animate-spin" /> Importing…</> : <>Re-import from LinkedIn</>}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => { setField("linkedinUrl", ""); toast.success("LinkedIn disconnected"); }}
-                  className="text-muted-foreground hover:text-destructive text-xs w-full"
-                >
-                  Disconnect
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <Input
-                  value={profile.linkedinUrl}
-                  onChange={(e) => setField("linkedinUrl", e.target.value)}
-                  placeholder="https://linkedin.com/in/yourhandle"
-                  className="bg-background border-border h-11"
-                />
-                <Button
-                  onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
-                  disabled={linkedinLoading}
-                  className="w-full rounded-xl h-11 bg-[#0A66C2] hover:bg-[#004182] text-white"
-                >
-                  {linkedinLoading ? (
-                    <><Loader2 className="size-4 mr-2 animate-spin" /> Importing profile…</>
-                  ) : (
-                    <><Linkedin className="size-4 mr-2" /> Connect & auto-fill</>
-                  )}
-                </Button>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  We'll try to pull your name, role, education and bio. LinkedIn often blocks public scraping — if fields stay blank, fill them manually.
-                </p>
-              </div>
-            )}
+            <Input
+              value={profile.linkedinUrl}
+              onChange={(e) => setField("linkedinUrl", e.target.value)}
+              placeholder="https://linkedin.com/in/yourhandle"
+              className="bg-background border-border h-10 text-sm mb-3"
+            />
+            <Button
+              onClick={() => populateFromLinkedIn(profile.linkedinUrl.trim())}
+              disabled={linkedinLoading || !profile.linkedinUrl.trim()}
+              className="w-full rounded-xl h-10 bg-[#0A66C2] hover:bg-[#004182] text-white"
+            >
+              {linkedinLoading ? (
+                <><Loader2 className="size-4 mr-2 animate-spin" /> Filling in…</>
+              ) : (
+                <>Auto-fill profile</>
+              )}
+            </Button>
           </div>
 
           {/* Resume upload */}
