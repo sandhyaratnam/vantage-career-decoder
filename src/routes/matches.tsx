@@ -231,6 +231,7 @@ function MatchesPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {rest.map((r) => {
           const inCompare = state.compareIds.includes(r.career.id);
+          const sal = adjustSalary(r.career.salaryLow, r.career.salaryHigh, state.profile);
           return (
             <article key={r.career.id} className="group rounded-2xl bg-card border border-border p-6 hover:border-brand-accent/40 hover:shadow-card transition-all flex flex-col">
               <div className="flex items-start justify-between mb-4">
@@ -246,8 +247,8 @@ function MatchesPage() {
               </div>
               <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] mb-4 pt-4 border-t border-border">
                 <div>
-                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC</dt>
-                  <dd className="font-mono text-foreground/90 mt-0.5">${r.career.salaryLow}k–${r.career.salaryHigh}k</dd>
+                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC{sal.adjusted ? "*" : ""}</dt>
+                  <dd className="font-mono text-foreground/90 mt-0.5">${sal.low}k–${sal.high}k</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">Transition</dt>
