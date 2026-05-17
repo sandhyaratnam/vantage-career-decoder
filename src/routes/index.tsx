@@ -9,6 +9,7 @@ import { useAppState } from "@/lib/store";
 import heroImg from "@/assets/welcome-hero.jpg";
 
 export const Route = createFileRoute("/")({
+  validateSearch: z.object({ q: z.coerce.number().int().min(1).optional() }),
   head: () => ({
     meta: [
       { title: "Survey — Vantage" },
