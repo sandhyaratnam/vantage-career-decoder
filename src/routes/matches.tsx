@@ -72,7 +72,7 @@ function MatchesPage() {
             Top 15 matches from your {Object.keys(state.answers).length} answers. Pick a few to compare side-by-side, or jump straight into a job description.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           {state.compareIds.length > 0 && (
             <Link to="/compare">
               <Button className="rounded-full h-11 bg-brand text-brand-foreground hover:bg-brand-accent">
@@ -80,11 +80,59 @@ function MatchesPage() {
               </Button>
             </Link>
           )}
+          <Button
+            variant="outline"
+            className="rounded-full h-11"
+            onClick={() => exportMatchesToPDF(ranked, state.profile, industryRankings)}
+          >
+            <Download className="size-4 mr-1.5" /> Download PDF
+          </Button>
           <Link to="/">
             <Button variant="outline" className="rounded-full h-11">Edit survey</Button>
           </Link>
         </div>
       </header>
+
+      {/* Edit answers strip */}
+      <section className="mb-10 rounded-2xl bg-card border border-border p-5">
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.22em] text-brand-accent font-semibold">Your answers</div>
+            <p className="text-xs text-muted-foreground mt-0.5">Saved automatically. Click any question to refine — matches update instantly.</p>
+          </div>
+        </div>
+        <ul className="flex flex-wrap gap-2">
+          {surveyQuestions.map((q, i) => {
+            const ans = state.answers[q.id];
+            const answered = q.type === "text"
+              ? typeof ans === "string" && ans.trim().length > 0
+              : Array.isArray(ans) && ans.length > 0;
+            const summary = q.type === "text"
+              ? (typeof ans === "string" && ans.trim() ? ans.trim().slice(0, 28) + (ans.trim().length > 28 ? "…" : "") : "—")
+              : Array.isArray(ans) && ans.length
+                ? ans.slice(0, 2).map((v) => q.options?.find((o) => o.value === v)?.label ?? v).join(", ") + (ans.length > 2 ? ` +${ans.length - 2}` : "")
+                : "—";
+            return (
+              <li key={q.id}>
+                <Link
+                  to="/"
+                  search={{ q: i + 1 }}
+                  className={`group inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all ${
+                    answered
+                      ? "bg-brand-soft border-brand-accent/30 text-foreground hover:border-brand-accent"
+                      : "bg-card border-dashed border-border text-muted-foreground hover:border-brand-accent/50"
+                  }`}
+                >
+                  <span className="font-mono text-[10px] text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-medium capitalize">{q.id}</span>
+                  <span className="opacity-70 max-w-[180px] truncate">· {summary}</span>
+                  <Pencil className="size-3 opacity-40 group-hover:opacity-90" />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       {/* Hero match */}
       <article className="rounded-3xl bg-gradient-to-br from-brand to-brand-accent text-brand-foreground p-8 md:p-12 mb-10 relative overflow-hidden shadow-elevated">
