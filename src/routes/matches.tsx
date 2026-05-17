@@ -163,12 +163,22 @@ function MatchesPage() {
               <div className="font-display text-7xl md:text-8xl font-bold tabular-nums">{top.fit}<span className="text-3xl opacity-70">%</span></div>
               <div className="text-xs uppercase tracking-[0.18em] opacity-70">Fit</div>
             </div>
-            <dl className="space-y-4 text-sm">
-              <Stat icon={DollarSign} label={top.career.tcNote ?? "Salary range"} value={`$${top.career.salaryLow}k – $${top.career.salaryHigh}k`} />
-              <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
-              <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
-              <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
-            </dl>
+            {(() => {
+              const sal = adjustSalary(top.career.salaryLow, top.career.salaryHigh, state.profile);
+              return (
+                <dl className="space-y-4 text-sm">
+                  <Stat
+                    icon={DollarSign}
+                    label={sal.adjusted ? "Salary · personalized" : (top.career.tcNote ?? "Salary range")}
+                    value={`$${sal.low}k – $${sal.high}k`}
+                    hint={sal.note}
+                  />
+                  <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
+                  <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
+                  <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
+                </dl>
+              );
+            })()}
           </div>
         </div>
 
