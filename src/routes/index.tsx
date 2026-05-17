@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useMemo } from "react";
+import { z } from "zod";
 import { ArrowRight, Check, Sparkles, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,6 +9,7 @@ import { useAppState } from "@/lib/store";
 import heroImg from "@/assets/welcome-hero.jpg";
 
 export const Route = createFileRoute("/")({
+  validateSearch: z.object({ q: z.coerce.number().int().min(1).optional() }),
   head: () => ({
     meta: [
       { title: "Survey — Vantage" },
@@ -25,8 +27,10 @@ function isAnswered(val: string[] | string | undefined, type: "multi" | "text" |
 function SurveyPage() {
   const { state, update } = useAppState();
   const navigate = useNavigate();
-  const [started, setStarted] = useState(false);
+  const { q: qParam } = Route.useSearch();
+  const [started, setStarted] = useState(!!qParam);
   const [idx, setIdx] = useState(() => {
+    if (qParam && qParam >= 1 && qParam <= surveyQuestions.length) return qParam - 1;
     const firstUnanswered = surveyQuestions.findIndex((q) => !isAnswered(state.answers[q.id], q.type));
     return firstUnanswered === -1 ? 0 : firstUnanswered;
   });

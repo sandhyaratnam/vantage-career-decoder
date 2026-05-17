@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo } from "react";
-import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign, Clock, AlertTriangle, ChevronRight } from "lucide-react";
+import { ArrowRight, ClipboardList, GitCompareArrows, Plus, Check, TrendingUp, MapPin, DollarSign, Clock, AlertTriangle, ChevronRight, Download, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { scoreCareers } from "@/lib/career-data";
+import { scoreCareers, surveyQuestions } from "@/lib/career-data";
+import { adjustSalary } from "@/lib/salary";
+import { exportMatchesToPDF } from "@/lib/export-pdf";
 import { useAppState } from "@/lib/store";
 
 export const Route = createFileRoute("/matches")({
@@ -70,7 +72,7 @@ function MatchesPage() {
             Top 15 matches from your {Object.keys(state.answers).length} answers. Pick a few to compare side-by-side, or jump straight into a job description.
           </p>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-3 shrink-0 flex-wrap">
           {state.compareIds.length > 0 && (
             <Link to="/compare">
               <Button className="rounded-full h-11 bg-brand text-brand-foreground hover:bg-brand-accent">
@@ -78,11 +80,59 @@ function MatchesPage() {
               </Button>
             </Link>
           )}
+          <Button
+            variant="outline"
+            className="rounded-full h-11"
+            onClick={() => exportMatchesToPDF(ranked, state.profile, industryRankings)}
+          >
+            <Download className="size-4 mr-1.5" /> Download PDF
+          </Button>
           <Link to="/">
             <Button variant="outline" className="rounded-full h-11">Edit survey</Button>
           </Link>
         </div>
       </header>
+
+      {/* Edit answers strip */}
+      <section className="mb-10 rounded-2xl bg-card border border-border p-5">
+        <div className="flex items-center justify-between gap-4 mb-3">
+          <div>
+            <div className="text-[11px] uppercase tracking-[0.22em] text-brand-accent font-semibold">Your answers</div>
+            <p className="text-xs text-muted-foreground mt-0.5">Saved automatically. Click any question to refine — matches update instantly.</p>
+          </div>
+        </div>
+        <ul className="flex flex-wrap gap-2">
+          {surveyQuestions.map((q, i) => {
+            const ans = state.answers[q.id];
+            const answered = q.type === "text"
+              ? typeof ans === "string" && ans.trim().length > 0
+              : Array.isArray(ans) && ans.length > 0;
+            const summary = q.type === "text"
+              ? (typeof ans === "string" && ans.trim() ? ans.trim().slice(0, 28) + (ans.trim().length > 28 ? "…" : "") : "—")
+              : Array.isArray(ans) && ans.length
+                ? ans.slice(0, 2).map((v) => q.options?.find((o) => o.value === v)?.label ?? v).join(", ") + (ans.length > 2 ? ` +${ans.length - 2}` : "")
+                : "—";
+            return (
+              <li key={q.id}>
+                <Link
+                  to="/"
+                  search={{ q: i + 1 }}
+                  className={`group inline-flex items-center gap-2 px-3 py-1.5 rounded-full border text-xs transition-all ${
+                    answered
+                      ? "bg-brand-soft border-brand-accent/30 text-foreground hover:border-brand-accent"
+                      : "bg-card border-dashed border-border text-muted-foreground hover:border-brand-accent/50"
+                  }`}
+                >
+                  <span className="font-mono text-[10px] text-muted-foreground tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="font-medium capitalize">{q.id}</span>
+                  <span className="opacity-70 max-w-[180px] truncate">· {summary}</span>
+                  <Pencil className="size-3 opacity-40 group-hover:opacity-90" />
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
 
       {/* Hero match */}
       <article className="rounded-3xl bg-gradient-to-br from-brand to-brand-accent text-brand-foreground p-8 md:p-12 mb-10 relative overflow-hidden shadow-elevated">
@@ -113,12 +163,22 @@ function MatchesPage() {
               <div className="font-display text-7xl md:text-8xl font-bold tabular-nums">{top.fit}<span className="text-3xl opacity-70">%</span></div>
               <div className="text-xs uppercase tracking-[0.18em] opacity-70">Fit</div>
             </div>
-            <dl className="space-y-4 text-sm">
-              <Stat icon={DollarSign} label={top.career.tcNote ?? "Salary range"} value={`$${top.career.salaryLow}k – $${top.career.salaryHigh}k`} />
-              <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
-              <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
-              <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
-            </dl>
+            {(() => {
+              const sal = adjustSalary(top.career.salaryLow, top.career.salaryHigh, state.profile);
+              return (
+                <dl className="space-y-4 text-sm">
+                  <Stat
+                    icon={DollarSign}
+                    label={sal.adjusted ? "Salary · personalized" : (top.career.tcNote ?? "Salary range")}
+                    value={`$${sal.low}k – $${sal.high}k`}
+                    hint={sal.note}
+                  />
+                  <Stat icon={Clock} label="Transition" value={top.career.transitionTime} />
+                  <Stat icon={TrendingUp} label="Market" value={top.career.growth} />
+                  <Stat icon={MapPin} label="Work mode" value={top.career.remote} />
+                </dl>
+              );
+            })()}
           </div>
         </div>
 
@@ -171,6 +231,7 @@ function MatchesPage() {
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
         {rest.map((r) => {
           const inCompare = state.compareIds.includes(r.career.id);
+          const sal = adjustSalary(r.career.salaryLow, r.career.salaryHigh, state.profile);
           return (
             <article key={r.career.id} className="group rounded-2xl bg-card border border-border p-6 hover:border-brand-accent/40 hover:shadow-card transition-all flex flex-col">
               <div className="flex items-start justify-between mb-4">
@@ -186,8 +247,8 @@ function MatchesPage() {
               </div>
               <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-[11px] mb-4 pt-4 border-t border-border">
                 <div>
-                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC</dt>
-                  <dd className="font-mono text-foreground/90 mt-0.5">${r.career.salaryLow}k–${r.career.salaryHigh}k</dd>
+                  <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">TC{sal.adjusted ? "*" : ""}</dt>
+                  <dd className="font-mono text-foreground/90 mt-0.5">${sal.low}k–${sal.high}k</dd>
                 </div>
                 <div>
                   <dt className="uppercase tracking-wider text-muted-foreground/70 font-semibold">Transition</dt>
@@ -230,7 +291,7 @@ function MatchesPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function Stat({ icon: Icon, label, value, hint }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; hint?: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="size-9 rounded-lg bg-brand-foreground/10 grid place-items-center">
@@ -239,6 +300,7 @@ function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
       <div>
         <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 font-semibold">{label}</div>
         <div className="font-medium">{value}</div>
+        {hint && <div className="text-[10px] opacity-60 mt-0.5">{hint}</div>}
       </div>
     </div>
   );
