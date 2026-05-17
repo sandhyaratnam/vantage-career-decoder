@@ -290,7 +290,7 @@ function MatchesPage() {
   );
 }
 
-function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
+function Stat({ icon: Icon, label, value, hint }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; hint?: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="size-9 rounded-lg bg-brand-foreground/10 grid place-items-center">
@@ -299,6 +299,7 @@ function Stat({ icon: Icon, label, value }: { icon: React.ComponentType<{ classN
       <div>
         <div className="text-[10px] uppercase tracking-[0.18em] opacity-60 font-semibold">{label}</div>
         <div className="font-medium">{value}</div>
+        {hint && <div className="text-[10px] opacity-60 mt-0.5">{hint}</div>}
       </div>
     </div>
   );
