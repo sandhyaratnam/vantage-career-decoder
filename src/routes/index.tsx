@@ -27,8 +27,10 @@ function isAnswered(val: string[] | string | undefined, type: "multi" | "text" |
 function SurveyPage() {
   const { state, update } = useAppState();
   const navigate = useNavigate();
-  const [started, setStarted] = useState(false);
+  const { q: qParam } = Route.useSearch();
+  const [started, setStarted] = useState(!!qParam);
   const [idx, setIdx] = useState(() => {
+    if (qParam && qParam >= 1 && qParam <= surveyQuestions.length) return qParam - 1;
     const firstUnanswered = surveyQuestions.findIndex((q) => !isAnswered(state.answers[q.id], q.type));
     return firstUnanswered === -1 ? 0 : firstUnanswered;
   });
